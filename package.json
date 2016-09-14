@@ -1,0 +1,11 @@
+{
+  "name": "dev-happiness-elixir",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Andreas Ronge <andreas.ronge@gmail.com> (https://github.com/andreasronge)",
+  "license": "ISC"
+}
