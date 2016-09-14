@@ -596,8 +596,37 @@ defmodule MyModule do
   # oneliner
   def add_one(x), do: sum(x, 1)  # No dot needed
 end
+```
 
-MyModule.add_one(42)
+```
+iex> MyModule.add_one(42)
+```
+
+
+## import
+
+* Not needed
+* Allows using without fully-qualified name.
+
+```
+iex> import MyModule
+iex> add_one(2)
+```
+
+
+## import scope
+
+```elixir
+defmodule Example do
+  def func1 do
+    List.flatten [1,[2,3],4]
+  end
+
+  def func2 do
+    import List, only: [flatten: 1]
+    flatten [5,[6,7],8]
+  end
+end
 ```
 
 
@@ -609,6 +638,25 @@ MyModule.add_one(42)
 * `!` postfix may throw exception
 
   Example: `File.open!/1`
+
+* snake_case atoms, functions, variables and files.
+
+
+## Nested Modules
+and file location
+
+```
+lib
+|-- ecto
+|   |-- adapter
+|   |   |-- migration.ex
+```
+
+```elixir
+defmodule Ecto.Adapter.Migration  do
+  # ...
+end
+```
 
 
 ## Function Refs
@@ -665,22 +713,6 @@ iex> add_two.(3)
 
 * `[1,2,3] |> Enum.map(&(&1 + 1))`
 * `a_function = fn(f) -> "#{f.()} hopp" end`
-
-
-## import
-
-```elixir
-defmodule Example do
-  def func1 do
-    List.flatten [1,[2,3],4]
-  end
-
-  def func2 do
-    import List, only: [flatten: 1]
-    flatten [5,[6,7],8]
-  end
-end
-```
 
 
 ## Module attributes
@@ -1379,6 +1411,7 @@ mix new my_plug
 cd my_plug
 ```
 
+
 ## Add a dependency
 
 Edit `mix.exs`
@@ -1395,6 +1428,7 @@ def deps do
    {:plug, "~> 1.0"}]
 end
 ```
+
 
 ## Download
 
