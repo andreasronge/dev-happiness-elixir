@@ -32,7 +32,7 @@ Andreas Ronge (@ronge)
 * Mix
 * Plug
 * ExUnit
-* Deployment: distillery
+* Distillery and hot upgrades
 
 
 ## Concurrency
@@ -1560,7 +1560,7 @@ my_plug (master) $ mix release
 `rel/my_plug/bin/my_plug start`
 
 
-## upgrade
+## hot upgrades
 
 ```
 my_plug (master) $ mix release --upgrade
