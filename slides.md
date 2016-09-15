@@ -163,6 +163,8 @@ Examples:
 :hej
 :"hej"
 :<>
+FooBar
+Hello.Foo
 ```
 
 
@@ -1446,6 +1448,7 @@ Add to lib/my_plug.ex:
 defmodule MyPlug do
   import Plug.Conn
 
+  # Executed in compile time !
   def init(options) do
     options
   end
@@ -1458,6 +1461,17 @@ defmodule MyPlug do
   end
 end
 ```
+
+
+## test
+
+Open iex with `iex -S mix`
+
+```
+{:ok, _} = Plug.Adapters.Cowboy.http MyPlug, []
+```
+
+Open browser http://localhost:4000
 
 
 ## more plug
@@ -1482,17 +1496,15 @@ end
 ```
 
 
+## Or pattern matching
 
-## test
-
-Open iex with `iex -S mix`
-
+```elixir
+def call(%Plug.Conn{request_path: "/" <> name} = conn, opts) do
+  send_resp(conn, 200, "Hello, #{name}")
+end
 ```
-{:ok, _} = Plug.Adapters.Cowboy.http MyPlug, []
-```
 
-Open browser http://localhost:4000
-
+TODO: check this
 
 
 # Processes

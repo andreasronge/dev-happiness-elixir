@@ -1,3 +1,5 @@
 node_modules/
+deps/
+_build/
 *.beam
 *.log
