@@ -29,11 +29,16 @@ Andreas Ronge (@ronge)
 
 ## Tools
 
+* Mix
+* Plug
+* ExUnit
+* Deployment: distillery
+
+
 ## Concurrency
 
-* Processes
-* Linking, trapping exit
-
+* Processes (TODO)
+* Linking, trapping exit (TODO)
 
 
 
@@ -819,6 +824,15 @@ Which will match when `x = 4` ?
 ```
 
 
+## Strings
+(binaries)
+
+```elixir
+"hej" <> hopp  = "hejhopp"
+[h| t] = to_char_list("abcd")
+```
+
+
 ## Head and Tails
 
 ```
@@ -1403,6 +1417,11 @@ GenServer module calls your callbacks.
 
 # Tools
 
+* Mix
+* Plug
+* ExUnit
+* Deployment distillery
+
 
 ## Mix
 
@@ -1437,6 +1456,7 @@ end
 ```
 mix deps.get
 mix deps.compile
+# or just: mix do deps.get, compile
 ```
 
 
@@ -1496,7 +1516,7 @@ end
 ```
 
 
-## Or pattern matching
+## Pattern matching
 
 ```elixir
 def call(%Plug.Conn{request_path: "/" <> name} = conn, opts) do
@@ -1504,7 +1524,60 @@ def call(%Plug.Conn{request_path: "/" <> name} = conn, opts) do
 end
 ```
 
-TODO: check this
+
+## Deployment
+
+[distillery](https://hexdocs.pm/distillery/getting-started.html)
+
+```
+defp deps do
+   [..., {:distillery, "~> 0.9.9"}]
+end
+```
+
+`mix deps.get`
+
+
+## create a release
+
+```
+my_plug (master) mix release.init  # only first time
+
+my_plug (master) $ mix release
+==> Assembling release..
+==> Building release my_plug:0.1.0 using environment dev
+==> You have set dev_mode to true, skipping archival phase
+==> Release successfully built!
+    You can run it in one of the following ways:
+      Interactive: rel/my_plug/bin/my_plug console
+      Foreground: rel/my_plug/bin/my_plug foreground
+      Daemon: rel/my_plug/bin/my_plug start
+```
+
+
+## start
+
+`rel/my_plug/bin/my_plug start`
+
+
+## upgrade
+
+```
+my_plug (master) $ mix release --upgrade
+Compiling 2 files (.ex)
+...
+==> Release successfully built!
+    You can run it in one of the following ways:
+      Interactive: rel/my_plug/bin/my_plug console
+      Foreground: rel/my_plug/bin/my_plug foreground
+      Daemon: rel/my_plug/bin/my_plug start
+
+my_plug (master) $ rel/my_plug/bin/my_plug upgrade 0.2.1
+Release 0.2.1 not found, attempting to unpack releases/0.2.1/my_plug.tar.gz
+Unpacked successfully: "0.2.1"
+Installed Release: 0.2.1
+Made release permanent: "0.2.1"
+```
 
 
 # Processes

@@ -3,7 +3,7 @@ defmodule MyPlug.Mixfile do
 
   def project do
     [app: :my_plug,
-     version: "0.1.0",
+     version: "0.2.1",
      elixir: "~> 1.3",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
@@ -31,6 +31,7 @@ defmodule MyPlug.Mixfile do
   # Type "mix help deps" for more examples and options
   def deps do
   [{:cowboy, "~> 1.0.0"},
-   {:plug, "~> 1.0"}]
+   {:plug, "~> 1.0"},
+   {:distillery, "~> 0.9.9"}]
   end
 end
