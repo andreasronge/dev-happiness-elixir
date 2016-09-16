@@ -27,6 +27,13 @@ Andreas Ronge (@ronge)
 * Macros
 
 
+## Concurrency
+
+* Processes
+* Linking, trapping exit (TODO)
+* Monitors
+
+
 ## Tools
 
 * Mix
@@ -35,10 +42,6 @@ Andreas Ronge (@ronge)
 * Distillery and hot upgrades
 
 
-## Concurrency
-
-* Processes (TODO)
-* Linking, trapping exit (TODO)
 
 
 
@@ -205,6 +208,29 @@ List.first(a)  # not often used !
 
 # Lists can be charlist !
 IO.puts "hej #{[49, 50, 51]}"  # =>  hej 123
+```
+
+
+## PIDs
+
+```
+iex> i self()
+Term
+  #PID<0.80.0>
+Data type
+  PID
+Alive
+  true
+Name
+  not registered
+Links
+  none
+Message queue length
+  0
+Description
+  Use Process.info/1 to get more info about this process
+Reference modules
+  Process, Node
 ```
 
 
@@ -996,12 +1022,16 @@ icecreams |> Enum.map(fn({_, price}) -> price end) |> Enum.sum
 
 ## Exercises 2, recursive
 
-Create a Module/Function: that returns the total price of all ice creams.
-Do not use `Enum` functions.
+Do not use `Enum`, use recursion
+
+* Return the length of the array
+* Get the total price of all ice creams
 
 ```
 icecreams = [{"cookies", 5}, {"chocolate", 3}, {"mint", 4}]
 ```
+
+(Erlang has tail call optimization)
 
 
 ## Guards
@@ -1100,6 +1130,7 @@ iex> cond do
 
 
 ## if and unless
+a macro : [Kernel.if](http://elixir-lang.org/docs/stable/elixir/Kernel.html#if/2)
 
 ```
 iex> if nil do
@@ -1114,6 +1145,7 @@ iex> if nil do
 ## if and unless, short
 
 ```
+if(foo, do: bar, else: baz)
 if true, do: 2, else: 4
 ```
 
@@ -1580,10 +1612,210 @@ Made release permanent: "0.2.1"
 ```
 
 
-# Processes
+
+# Concurrency
+
+
+## Processes
 
 * all code runs inside processes
-* message passing, share nothing
+* actor model: message passing, share nothing
 * extremely lightweight
 * takes advantage of a multi-core or multi-CPU computer
 * each process has a private heap that is garbage collected independently
+
+
+## Creating a new process
+
+* `spawn((() -> any)) :: pid`
+* `spawn(module, atom, list) :: pid`
+* `spawn_link(module, atom, list) :: pid`
+* `spawn_monitor((() -> any)) :: {pid, reference}`
+
+
+## Sending
+
+* send is asynchronoues
+* send a message to a mail box
+
+```
+iex> send self(), "hello world"
+"hello world"
+iex> flush # empty and checks what's in the mail box
+"hello world"
+```
+
+
+## receive
+
+* Each process has a mail box
+* in receive block:
+* * messages are removed if matched
+* * unmatched messages are retried later
+* * none matching message suspends the process
+* * timeout can be specified
+
+
+## Example
+
+```elixir
+current = self()
+child   = spawn(fn -> send current, {self(), 3} end)
+
+receive do
+   {^child, x} -> IO.puts "Received #{x} back"
+end
+```
+
+
+## How keep process alive
+
+we want to send another message
+
+```
+iex> Process.alive? child
+```
+
+
+## Calculate Area
+
+```elixir
+defmodule Area do
+  def loop() do
+    receive do
+      {from, {:rectangle, w, h}} ->
+        send(from, w * h)
+        loop()  # This is how keep it alive
+      _ -> IO.puts "Unknown message"
+    end
+  end
+end
+```
+
+```
+iex> pid = spawn(Area, :loop, [])
+iex> send(pid, {self(), {:rectangle, 2,3}})
+iex> flush
+```
+
+
+## Exercise
+
+Create a process that holds state so that:
+
+```
+iex> pid = spawn(MyState, :loop, [%{bar: "foo"}])
+iex> send(pid, {:get, :bar})
+iex> flush
+"foo"
+iex> send(pid, {:set, :bar, "baaz"})
+iex> send(pid, {:get, :bar})
+iex> flush
+"baaz"
+```
+
+
+## Solution
+
+```elixir
+defmodule MyState do
+  def loop(state) do
+    receive do
+      {from, {:get, key}} ->
+        send(from, state[key])
+        loop(state)
+      {from, {:set, key, value}} ->
+        loop(Map.put(state, key, value))
+      _ -> IO.puts "Unknown message"
+    end
+  end
+end
+```
+
+
+## Agents
+
+```
+iex> {:ok, agent} = Agent.start_link fn -> [] end
+{:ok, #PID<0.57.0>}
+iex> Agent.update(agent, fn list -> ["eggs" | list] end)
+:ok
+iex> Agent.get(agent, fn list -> list end)
+["eggs"]
+iex> Agent.stop(agent)
+:ok
+```
+
+Why keeping state in a separate process ?
+
+
+## When a process dies
+
+* When a process reaches its end, it exits with reason `:normal`.
+* Call `exit/1` if you want to terminate a process but not signal any failure:
+* If the exit reason is not `:normal`, all the processes linked to the process that
+exited will crash (unless they are trapping exits).
+
+```
+iex(42)> exit(:oj)
+** (exit) :oj  # crash and restart iex
+```
+
+
+## Linking and Trapping
+
+```
+iex> Process.flag(:trap_exit, true)
+iex> pid = spawn_link(MyState, :loop, [%{}])
+iex> send(pid, :unknown)
+iex> flush
+{:EXIT, #PID<0.162.0>, :normal}
+
+# or kill it
+iex> pid = spawn_link(MyState, :loop, [%{}])
+iex> Process.exit(pid, :kill)
+iex> flush
+{:EXIT, #PID<0.166.0>, :killed}
+```
+
+
+## GenServer
+
+```elixir
+defmodule Stack do
+  use GenServer
+
+  def start_link(state, opts \\ []) do
+    GenServer.start_link(__MODULE__, state, opts)
+  end
+
+  def handle_call(:pop, _from, [h | t]) do
+    {:reply, h, t}
+  end
+
+  def handle_cast({:push, h}, t) do
+    {:noreply, [h | t]}
+  end
+end
+```
+
+
+## Calling GenServer
+
+```
+iex> {:ok, pid} = Stack.start_link([])
+iex> GenServer.cast(pid, {:push, :world})
+:ok
+iex> GenServer.call(pid, :pop)           
+:world
+iex> GenServer.call(pid, :pop)
+
+[error] GenServer #PID<0.182.0> terminating
+```
+
+
+## Supervisor
+
+* Manages one or more worker processes or supervisors
+* Handles process exits, e.g. with a restart
+TODO
