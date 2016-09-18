@@ -12,23 +12,28 @@ defmodule MyStack.Supervisor do
     ]
     supervise(children, strategy: :one_for_one)
   end
-
 end
 
 
-defmodule MyStack.Server do
-  use GenServer # thin wrapper around OTP's :gen_server
-
-  def start_link(state) do
-    GenServer.start_link(__MODULE__, state, name: __MODULE__)
+defmodule MyStack do
+  def start do
+    MyStack.Supervisor.start_link
   end
 
   def push(data) do
-    GenServer.cast(__MODULE__, {:push, data}) # ASync !
+    GenServer.cast(MyStack.Server, {:push, data}) # ASync !
   end
 
   def pop() do
-    GenServer.call(__MODULE__, :pop) # Sync !
+    GenServer.call(MyStack.Server, :pop) # Sync !
+  end
+end
+
+defmodule MyStack.Server do
+  use GenServer
+
+  def start_link(state) do
+    GenServer.start_link(MyStack.Server, state, name: MyStack.Server)
   end
 
   def handle_call(:pop, _from, [h | t]), do: {:reply, h, t}
