@@ -1264,24 +1264,41 @@ end
 * Abstract generic functionalities
 
 
-## Example, API
+## Dynamic Invocation
 
-```elixir
-defmodule Animal do
-  @callback legs() :: integer
-  @callback eats() :: String.t
-end
+```
+iex> x = IO
+IO
+iex> x.puts "HEJ"
+HEJ
+:ok
+iex> apply(IO, :puts, ["hej"])
+hej
+:ok
 ```
 
 
-## Implementation
+## Example, API
 
 ```elixir
-defmodule Cat do
-  @behaviour Animal
-  def legs, do: 4
-  def eats, do: "cat food"
+defmodule Greeter do
+  @callback say_hello(String.t) :: any
+  @callback say_goodbye(String.t) :: any
 end
+
+defmodule NormalGreeter do
+  @behaviour Greeter
+  def say_hello(name), do: IO.puts "Hello, #{name}"
+  def say_goodbye(name), do: IO.puts "Goodbye, #{name}"
+end
+
+defmodule HelloAll do
+  def hello_to_all(greeters) do
+    greeters |> Enum.each(& &1.say_hello("andreas"))
+  end
+end
+
+HelloAll.hello_to_all([NormalGreeter])
 ```
 
 
@@ -1423,7 +1440,8 @@ end
 ```
 
 
-## Using __using__
+## Usage
+Using `__using__`
 
 ```elixir
 defmodule MyModule do
@@ -1749,6 +1767,15 @@ iex> Agent.stop(agent)
 Why keeping state in a separate process ?
 
 
+## Tasks
+
+```elixir
+task = Task.async(fn -> do_some_work() end)
+res  = do_some_other_work()
+res + Task.await(task)
+```
+
+
 ## When a process dies
 
 * When a process reaches its end, it exits with reason `:normal`.
@@ -1779,43 +1806,217 @@ iex> flush
 ```
 
 
-## GenServer
+
+# OTP: GenServer
+
+
+* Generic part - behaviour
+* Specific part - callback modules
+
+
+## OTP behaviours
+
+* `:gen_server` stateful server process
+* `:supervisor` recovery
+* `:application` components/libraries
+* `:gen_event` event handling
+* `:gen_fsm` - finite state machine
+
+
+## Common needs
+
+A stateful server process:
+* Spawn a new process
+* Run a loop
+* Maintain process state
+* React to messages
+* Send response back
+
+
+## GenServer Callbacks
+
+* init/1
+* terminate/2
+* handle_call/3
+* handle_cast
+* handle_info
+* code_change/3
+
+
+## GenServer Module
+
+* GenServer.start -> init/1
+* GenServer.start_link -> init/1
+* GenServer.stop -> terminate/2
+* GenServer.call -> handle_call/3
+* GenServer.cast -> handle_cast/2
+
+
+## GenServer.handle_call/3
+
+* Args: request, caller pid, state
+* Returns: `{:reply, response, new_state}`
 
 ```elixir
-defmodule Stack do
-  use GenServer
+# API
+def pop(pid) do
+  GenServer.call(pid, :pop) # Sync !
+end
+
+# Callback
+def handle_call(:pop, _from, [h | t]) do
+  {:reply, h, t}
+end
+```
+
+
+## GenServer.handle_cast/2
+
+* Args: request, state
+* Returns: {:no_reply, new_state}
+
+```elixir
+# API
+def push(pid, data) do
+  GenServer.cast(pid, {:push, data}) # ASync !
+end
+
+# Callback
+def handle_cast({:push, h}, t) do
+  {:noreply, [h | t]}  # Async !
+end
+```
+
+
+## OTP GenServer
+
+```elixir
+defmodule MyStack do
+  use GenServer # thin wrapper around OTP's :gen_server
 
   def start_link(state, opts \\ []) do
     GenServer.start_link(__MODULE__, state, opts)
   end
 
-  def handle_call(:pop, _from, [h | t]) do
-    {:reply, h, t}
+  def push(pid, data) do
+    GenServer.cast(pid, {:push, data}) # ASync !
   end
 
-  def handle_cast({:push, h}, t) do
-    {:noreply, [h | t]}
+  def pop(pid) do
+    GenServer.call(pid, :pop) # Sync !
   end
+
+  def handle_call(:pop, _from, [h | t]), do: {:reply, h, t}
+  def handle_cast({:push, h}, t), do: {:noreply, [h | t]}
 end
 ```
 
 
-## Calling GenServer
+## Usage
 
 ```
-iex> {:ok, pid} = Stack.start_link([])
-iex> GenServer.cast(pid, {:push, :world})
+iex> {_, pid} = MyStack.start_link([])
+{:ok, #PID<0.94.0>}
+iex> MyStack.push(pid, 42)
 :ok
-iex> GenServer.call(pid, :pop)           
-:world
-iex> GenServer.call(pid, :pop)
-
-[error] GenServer #PID<0.182.0> terminating
+iex> MyStack.push(pid, 43)
+:ok
+iex> MyStack.pop(pid)
+43
 ```
+
+
+## Register PID
+
+```elixir
+defmodule MyStack.Server do
+  use GenServer
+
+  def start_link(state) do
+    GenServer.start_link(__MODULE__, state, name: __MODULE__)
+  end
+
+  def push(data) do
+    GenServer.cast(__MODULE__, {:push, data}) # ASync !
+  end
+
+  def pop() do
+    GenServer.call(__MODULE__, :pop) # Sync !
+  end
+
+  def handle_call(:pop, _from, [h | t]), do: {:reply, h, t}
+  def handle_cast({:push, h}, t), do: {:noreply, [h | t]}
+end
+```
+
+
+## Let it crash
+
+```
+iex> MyStack.pop(pid)
+42
+iex> MyStack.pop(pid)
+** (EXIT from #PID<0.80.0>) an exception was raised:
+iex> MyStack.pop(pid)
+** (CompileError) iex:2: undefined function pid/0  
+```
+
+What happened ?
+
+
+
+# OTP supervisors
 
 
 ## Supervisor
 
 * Manages one or more worker processes or supervisors
 * Handles process exits, e.g. with a restart
-TODO
+* Impl. the GenServer behaviour
+
+
+## callbacks
+
+* `init/1` - returns a supervisor specification of child processes to supervise
+
+
+## worker
+
+`Supervisor.Spec.worker/3`
+
+```elixir
+children = worker(MyStack, [[]])
+```
+
+Will start Todo by calling `start_link` with one argument []
+
+
+## Strategies
+
+```
+supervise(children, strategy: :one_for_one)
+```
+
+* `:one_for_one` - If a child process terminates, only that process is restarted.
+* `:one_for_all`, `:rest_for_one`, `:simple_one_for_one`
+
+
+## Example
+
+```elixir
+defmodule MyStack.Supervisor do
+  use Supervisor
+
+  def start_link do
+    Supervisor.start_link(__MODULE__, nil)
+    # will call init with nil as argument
+  end
+
+  def init(_) do
+    children = [
+      worker(MyStack.Server, [["initial value"]])
+    ]
+    supervise(children, strategy: :one_for_one)
+  end
+end
+```
