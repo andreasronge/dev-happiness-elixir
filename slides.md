@@ -7,9 +7,11 @@ Andreas Ronge (@ronge)
 
 # Contents
 
+* Introduction
 * Language
 * Tools
 * Concurrency
+* Distributed Elixir (todo)
 
 
 ## The language
@@ -43,6 +45,36 @@ Andreas Ronge (@ronge)
 * Distillery and hot upgrades
 
 
+
+# Introduction
+
+
+## Why Erlang
+
+Design for:
+* Fault-tolerant
+* Highly availability
+* Hot code replacement
+* Self healing network
+* Distributed
+* Soft real-time
+
+
+## How
+
+* Functional Programming
+* Actor Model (independent discovery)
+* OTP patterns, e.g. supervisor behaviour
+
+
+## Why Elixir
+
+* Make Erlang it's tool more accessible
+* Meta programming
+* Extendable language: Polymorphism
+* Pipeline operator
+* Fantastic elixir libraries, mix, hex
+* Fun !
 
 
 
@@ -910,9 +942,23 @@ iex> name
 ```
 
 
+# with
+
+Combines matching clauses.
+
+```
+iex> opts = %{width: 10, height: 15}
+iex> with {:ok, width} <- Map.fetch(opts, :width),
+...>      {:ok, height} <- Map.fetch(opts, :height),
+...>   do: {:ok, width * height}
+{:ok, 150}
+```
+
+
 ## Advanced pattern matching
 
 What does this do ?
+[PragProg Example](https://media.pragprog.com/titles/elixir/lists.pdf)
 
 ```elixir
 def for_location([ head = [_, target_loc, _, _ ] | tail], target_loc) do
@@ -1149,6 +1195,7 @@ iex> if nil do
 if(foo, do: bar, else: baz)
 if true, do: 2, else: 4
 ```
+
 
 
 # Stream module
@@ -1512,6 +1559,18 @@ mix deps.compile
 
 
 ## Plug
+
+* A unified API that abstracts away the web library/framework.
+* Stackable plugs, (`conn |> plug1 |> plug2`)
+
+
+## Cowboy
+
+* Small, fast, modular HTTP server written in Erlang
+
+
+
+## Plug Example
 
 Add to lib/my_plug.ex:
 
@@ -2088,3 +2147,7 @@ defmodule MyStack.Server do
   def handle_cast({:push, h}, t), do: {:noreply, [h | t]}
 end
 ```
+
+
+
+# Distributed Elixir
