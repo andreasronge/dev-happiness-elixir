@@ -1528,7 +1528,7 @@ GenServer module calls your callbacks.
 
 # Tools
 
-* Mix
+* Mix/Hex
 * Plug
 * ExUnit
 * Deployment distillery
@@ -1571,6 +1571,14 @@ mix deps.compile
 ```
 
 
+## Hex
+
+The package manager for the Erlang ecosystem
+(can be used with rebar3 erlang build tool)
+
+http://hex.pm](https://hex.pm/)
+
+
 ## Plug
 
 * A unified API that abstracts away the web library/framework.
@@ -1580,7 +1588,6 @@ mix deps.compile
 ## Cowboy
 
 * Small, fast, modular HTTP server written in Erlang
-
 
 
 ## Plug Example
@@ -2176,8 +2183,25 @@ end
 
 # Application Behaviour
 
-* runtime, buildtime deps
-Todo, mix
+
+```elixir
+defmodule MyPlug.Mixfile do
+  use Mix.Project
+
+  def project do  # Description of the project
+    [ app: :my_plug, version: "0.2.1", elixir: "~> 1.3", ...
+     deps: deps()]
+  end
+
+  # Configuration for the OTP application
+  def application do
+    [ applications: [:logger, :cowboy, :plug], # Runtime deps  
+      mod: {MyPlug, []} # The Application OTP Behaviour
+    ]
+  end
+
+  def deps: ...  # compile time deps, both erlang and elixir projects
+```
 
 
 ## Application module
@@ -2193,22 +2217,29 @@ end
 ```
 
 
-## inside _build folder
+## Why
 
-The _builder folder:
-
-Todo
-
-
-## Application configuration
-
-Todo
+* Reusable components
+* Configure without recompile
+* Runtime dependencies
+* Automatic start
 
 
-## Library applications
+## Application Configuration
 
-TODO
+```
+def application do [
+  ...
+  env: [port: 5454]  # default
+]
+```
+
+or just `iex --erl "myplug port 5454" -S mix`
+
+`Application.get_env/2`
+
 
 
 # Distributed Elixir
+
 Todo
