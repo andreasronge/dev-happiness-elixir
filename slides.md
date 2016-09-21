@@ -16,7 +16,6 @@ Andreas Ronge (@ronge)
 
 ## The language
 
-* Interactive Elixir Shell
 * Operators
 * Datatypes
 * Functions/Modules
@@ -87,7 +86,12 @@ Design for:
 * IEX and elixir docs
 
 
-# IEX
+## Installation
+
+* `brew install elixir`
+
+
+## IEX
 
 [<img src="img/iex.png">](img/iex.png)
 
@@ -2242,4 +2246,28 @@ or just `iex --erl "myplug port 5454" -S mix`
 
 # Distributed Elixir
 
-Todo
+
+## Nodes
+
+Connecting nodes to clusters
+
+```
+iex --sname foo@localhost
+iex(foo@localhost)> Node.connect :bar@localhost
+true
+iex(foo@localhost)2> Node.list
+[:bar@localhost]
+```
+
+```
+ iex --sname bar@localhost
+```
+
+
+## Via LAN
+
+Need shared cookie
+
+```
+iex --name one@192.168.0.42 --cookie secret
+```
