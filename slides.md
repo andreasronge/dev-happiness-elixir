@@ -69,13 +69,22 @@ Design for:
 
 ## Why Elixir
 
-* Make Erlang it's tool more accessible
+* Make Erlang & tools more accessible
 * Meta programming
 * Extendable language: Polymorphism
 * Pipeline operator
 * Fantastic elixir libraries, mix, hex
 * Fun !
 
+
+## Resources
+
+* Books
+  * [Programming Elixir](https://pragprog.com/book/elixir/programming-elixir)
+  * [Elixir in Action](https://www.manning.com/books/elixir-in-action)
+* [elixir-lang.org](http://elixir-lang.org/)  
+* [exercism.io](http://exercism.io/)
+* IEX and elixir docs
 
 
 # IEX
@@ -110,8 +119,10 @@ iex> import_file "hello.exs"
 
 
 
+# The Language
 
-# Operators
+
+## Operators
 
 
 ## True and False
@@ -1325,6 +1336,8 @@ hej
 :ok
 ```
 
+MFA - module, function, arguments list
+
 
 ## Example, API
 
@@ -2084,21 +2097,19 @@ end
 
 ## children
 
+Register pid with an alias
+
 ```elixir
-defmodule MyStack.Supervisor do
-  use Supervisor
+defmodule MyStack.Server do
+  use GenServer
 
-  def start_link do
-    Supervisor.start_link(__MODULE__, nil)
-    # will call init with nil as argument
+  def start_link(state) do             # Register a pid with an alias
+    d#                                           |
+    GenServer.start_link(MyStack.Server, state, name: MyStack.Server)
   end
 
-  def init(_) do
-    children = [
-      worker(MyStack.Server, [["initial value"]])
-    ]
-    supervise(children, strategy: :one_for_one)
-  end
+  def handle_call(:pop, _from, [h | t]), do: {:reply, h, t}
+  def handle_cast({:push, h}, t), do: {:noreply, [h | t]}
 end
 ```
 
@@ -2148,6 +2159,56 @@ defmodule MyStack.Server do
 end
 ```
 
+## Multiple Children
+
+* How to get PIDs ?
+(registered alias does not work)
+
+* Process Registry (gproc)
+  * A supervisor for a pool of worker
+
+
+## Riak Supervisor Tree
+
+[<img src="img/supervision-tree.png">](img/supervision-tree.png)
+
+
+
+# Application Behaviour
+
+* runtime, buildtime deps
+Todo, mix
+
+
+## Application module
+
+```elixir
+defmodule MyApp do
+  use Application
+
+  def start(_type, _args) do
+    MyApp.Supervisor.start_link()
+  end
+end
+```
+
+
+## inside _build folder
+
+The _builder folder:
+
+Todo
+
+
+## Application configuration
+
+Todo
+
+
+## Library applications
+
+TODO
 
 
 # Distributed Elixir
+Todo
