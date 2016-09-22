@@ -28,20 +28,27 @@ Andreas Ronge (@ronge)
 * Macros
 
 
-## Concurrency
-
-* Processes
-* Linking, trapping exit
-* OTP gen_server
-* OTP gen_supervisor
-
-
 ## Tools
 
-* Mix
-* Plug
-* ExUnit
-* Distillery and hot upgrades
+* mix, hex
+* exunit
+* hot deployment, distillery
+* plug
+
+
+## Concurrency
+
+* Processes, Linking/Trapping
+* OTP Server
+* OTP Supervisor
+* OTP Application
+
+
+## Distributed Elixir
+
+* nodes
+* discovery
+* multicast, clusters/groups
 
 
 
@@ -74,6 +81,23 @@ Design for:
 * Pipeline operator
 * Fantastic elixir libraries, mix, hex
 * Fun !
+
+
+## Future
+
+* Future of functional programming ?
+* What's the future of the JVM ?
+* What type of application will we need to build ?
+* Fashion and who will we listen to ?
+* Syntax matters
+* Finding jobs/developers
+
+
+## Fun driven development
+
+"Change is the only constant"
+
+Let's try new things and have fun
 
 
 ## Resources
@@ -2271,3 +2295,41 @@ Need shared cookie
 ```
 iex --name one@192.168.0.42 --cookie secret
 ```
+
+
+## Spawn
+
+```
+iex(foo@localhost)> Node.list
+[:bar@localhost]
+iex(foo@localhost)> called = self  # using closure
+#PID<0.86.0>
+iex(foo@localhost)6> Node.spawn(:bar@localhost, fn -> send(called, {:response, "Hi"}) end)
+#PID<8914.92.0>  # Different PID !
+iex(foo@localhost)7> flush
+{:response, "Hi"}
+```
+
+Use MFA (module, function argument list) instead of lambdas
+
+
+
+## Monitoring nodes
+
+`:net_kernel.monitor_nodes/1,2`
+TODO
+
+
+## Global Registration
+
+Todo
+
+```global.register_name```  cluster wide alias
+
+GenServer.start_link, name: {:global, :some_alias}
+
+
+## Process Groups
+
+* Multiple redundant processes
+* `GenServer.multi_call` to update all
