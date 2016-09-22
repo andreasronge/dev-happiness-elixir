@@ -11,7 +11,7 @@ Andreas Ronge (@ronge)
 * Language
 * Tools
 * Concurrency
-* Distributed Elixir (todo)
+* Distributed Elixir
 
 
 ## The language
@@ -2311,7 +2311,6 @@ iex(foo@localhost)7> flush
 ```
 
 Use MFA (module, function argument list) instead of lambdas
-
 
 
 ## Monitoring nodes
