@@ -5,7 +5,7 @@ defmodule MyPlugTest do
 
   test "get" do
     conn = conn(:get, "/")
-    response = MyPlug.call(conn, [])
+    response = MyPlug.Hello.call(conn, [])
     assert response.status == 200
   end
 end

@@ -137,6 +137,7 @@ IO.puts "Hello"
 ```
 iex> c "hello.exs"
 iex> import_file "hello.exs"
+iex> r HelloWorld
 ```
 
 
@@ -446,7 +447,7 @@ iex> bit_size(<<2.5::float>>)
 ## Keyword Lists
 
 ```text
-iex> [{:a, 1}, {:b, 2}]      
+iex> [{:a, 1}, {:b, 2}]  # Array with tuples
 [a: 1, b: 2]  # What ?
 
 iex> [a: 1, b: 2]
@@ -480,13 +481,27 @@ x: hej y: [a: 2]
 
 ## Exercise
 
-Check if key `:b` is in
-
 ```
-[a: 1, b: 2, c: 3]
+kw = [a: 1, b: 2, c: 3]
 ```
 
-(use the Enum and Keyword Modules)
+1. Check if key `:b` is in `kw`
+2. Update `c` to 42
+
+(use the Keyword module)
+
+
+## Answer
+
+```elixir
+# 1)
+kw = [a: 1, b: 2, c: 3]
+Keyword.has_key?(kw, :b)
+kw[:b] # access
+
+# 2) Creates a new keyword list
+Keyword.put(kw, :b, 42)  
+```
 
 
 ## Maps
@@ -528,14 +543,15 @@ iex> map = %{a: 1, b: 2}
 
 ## Exercise
 
-Use the `Map` api to
-* create a list of the keys of map
-* change `bar` prop to "bye"
-* add a new key and value
-
 ```
 x = %{a: 1, foo: 42, bar: "hello"}
 ```
+
+1. create a list of the keys
+2. change `bar` prop to "bye"
+3. add a new key and value
+
+(Use the `Map` api)
 
 
 ## More convenience
@@ -585,6 +601,15 @@ iex)> users = put_in users[:john].age, 31
 [john: %{age: 31, languages: ["Erlang", "Ruby", "Elixir"], name: "John"},
  mary: %{age: 29, languages: ["Elixir", "F#", "Clojure"], name: "Mary"}]
 ```
+
+
+## Exercise
+
+1. Create a list
+2. Create a tuple with 2 atoms and 2 charlists
+3. Create a Keyword list
+4. Create a map with Atom keys
+5. Create a map with String keys
 
 
 ## Structs
@@ -653,7 +678,6 @@ end
 
 ## Exercise
 
-
 ```
 %Plug.Conn{host: "www.example.com",
            path_info: ["bar", "baz"]}
@@ -661,9 +685,22 @@ end
 ```
 
 * Create the struct
-* Update host
+* Create an instance with the data above
+* Update host to "foo.com"
 * Add "foobar" to `path_info`
 
+
+## Answer
+
+```elixir
+defmodule Plug.Conn do
+  defstruct host: "", path_info: []
+end
+
+conn = %Plug.Conn{host: "www.example.com", path_info: ["bar", "baz"]}
+%{conn | host: "foo.com"}
+put_in conn.path_info, conn.path_info ++ ["foobar"]
+```
 
 
 
@@ -698,13 +735,33 @@ defmodule MyModule do
     x + y
   end
 
-  # oneliner
+  # oneliner, notice similarity to keyword list
   def add_one(x), do: sum(x, 1)  # No dot needed
 end
 ```
 
 ```
 iex> MyModule.add_one(42)
+```
+
+
+## Exercise
+
+Create the `silly` function so that
+
+```elixir
+f = fn (x) -> x * 2 end
+
+42 |> MyModule.silly(f) # "x: 84"
+```
+
+
+## Answer
+
+```elixir
+defmodule MyModule do                      
+  def silly(val, fun), do: "x: #{fun.(val)}"
+end
 ```
 
 
@@ -717,6 +774,8 @@ iex> MyModule.add_one(42)
 iex> import MyModule
 iex> add_one(2)
 ```
+
+(`require` is for macros)
 
 
 ## import scope
@@ -804,11 +863,11 @@ iex> add_two.(3)
 
 ## Exercises
 
-* Use `Enum.map` to make
+* A) Use `Enum.map` to make
 
    `[1,2,3] |> ___ => [2,3,4]`
 
-* Write a function that takes a function so that
+* B) Write a function that takes a function so that
 
   `a_function.(fn -> "hej" end)`
   returns: "hej hopp"
@@ -816,8 +875,13 @@ iex> add_two.(3)
 
 ## Solutions
 
-* `[1,2,3] |> Enum.map(&(&1 + 1))`
-* `a_function = fn(f) -> "#{f.()} hopp" end`
+```elixir
+# A)
+[1,2,3] |> Enum.map(&(&1 + 1))
+
+# B)
+a_function = fn(f) -> "#{f.()} hopp" end
+```
 
 
 ## Module attributes
@@ -1042,12 +1106,32 @@ iex> %{:c => c} = %{:a => 1, 2 => :b}
 
 ## Exercises, Destructing
 
-* Set `a = :bar` from `{:foo, :bar}`
+Example:
+Set `a = :bar` from `{:foo, :bar}`
 
-  Solution: `{_, a} = {:foo, :bar}`
-* Set `a=4` from the array `[[1,2], [3,4]]`
-* Set `a = 4` and `b = [3, 4]` from `[[1,2], [3,4]]`
-* Set `a="kalle"` from `[{3, %{name: "kalle"}}]`
+Solution: `{_, a} = {:foo, :bar}`
+
+* a) Set `a=:b` from  `[{:a,:b,:c}]`
+* b) Set `a=4` from  `[[1,2], [3,4]]`
+* c) Set `a=4` and `b=[3,4]` from `[[1,2], [3,4]]`
+* d) Set `a="kalle"` from `[{3, %{name: "kalle"}}]`
+
+
+## Answers
+
+```elixir
+# a)
+[{_,a,_}] = [{:a,:b,:c}]
+
+# b)
+[_, [_, a]] = [[1,2], [3,4]]
+
+# c)
+[_, b=[_,a]] = [[1,2], [3,4]]
+
+# d)
+[{_, %{name: a}}] = [{3, %{name: "kalle"}}]  
+```
 
 
 ## Functions args
@@ -1167,7 +1251,6 @@ iex> for n <- 0..5, multiple_of_3?.(n), do: n * n
 
 
 ## into
-
 
 ```elixir
 for {key, val} <- %{"a" => 1, "b" => 2}, into: %{}, do: {key, val * val}
@@ -1683,6 +1766,23 @@ end
 ```
 
 
+## ExUnit
+
+```elixir
+defmodule MyPlugTest do
+  use ExUnit.Case, async: true
+  use Plug.Test
+  doctest MyPlug
+
+  test "get" do
+    conn = conn(:get, "/")
+    response = MyPlug.call(conn, [])
+    assert response.status == 200
+  end
+end
+```
+
+
 ## Deployment
 
 [distillery](https://hexdocs.pm/distillery/getting-started.html)
@@ -2194,6 +2294,7 @@ defmodule MyStack.Server do
 end
 ```
 
+
 ## Multiple Children
 
 * How to get PIDs ?
@@ -2285,6 +2386,15 @@ iex(foo@localhost)2> Node.list
 
 ```
  iex --sname bar@localhost
+```
+
+
+## Remote shell
+
+```
+ iex --sname baz --remsh foo@HOST
+ # for more info:
+ iex> h(IEx)
 ```
 
 
