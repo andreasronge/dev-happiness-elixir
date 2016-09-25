@@ -9,9 +9,9 @@ Andreas Ronge (@ronge)
 
 * Introduction
 * Language
-* Tools
 * Concurrency
 * Distributed Elixir
+* Tools
 
 
 ## The language
@@ -28,20 +28,11 @@ Andreas Ronge (@ronge)
 * Macros
 
 
-## Tools
-
-* mix, hex
-* exunit
-* hot deployment, distillery
-* plug
-
-
 ## Concurrency
 
 * Processes, Linking/Trapping
 * OTP Server
 * OTP Supervisor
-* OTP Application
 
 
 ## Distributed Elixir
@@ -49,6 +40,14 @@ Andreas Ronge (@ronge)
 * nodes
 * discovery
 * multicast, clusters/groups
+
+
+## Tools
+
+* mix, hex
+* exunit, plug
+* hot deployment, distillery
+* OTP Application
 
 
 
@@ -1670,225 +1669,6 @@ GenServer module calls your callbacks.
 
 
 
-# Tools
-
-* Mix/Hex
-* Plug
-* ExUnit
-* Deployment distillery
-
-
-## Mix
-
-Generate a new project
-
-```
-mix new my_plug
-cd my_plug
-```
-
-
-## Add a dependency
-
-Edit `mix.exs`
-
-Add:
-
-```
-def application do
-  [applications: [:cowboy, :plug]]
-end
-
-def deps do
-  [{:cowboy, "~> 1.0.0"},
-   {:plug, "~> 1.0"}]
-end
-```
-
-
-## Download
-
-```
-mix deps.get
-mix deps.compile
-# or just: mix do deps.get, compile
-```
-
-
-## Hex
-
-The package manager for the Erlang ecosystem
-(can be used with rebar3 erlang build tool)
-
-http://hex.pm](https://hex.pm/)
-
-
-## Plug
-
-* A unified API that abstracts away the web library/framework.
-* Stackable plugs, (`conn |> plug1 |> plug2`)
-
-
-## Cowboy
-
-* Small, fast, modular HTTP server written in Erlang
-
-
-## Plug Example
-
-Add to lib/my_plug.ex:
-
-```elixir
-defmodule MyPlug do
-  import Plug.Conn
-
-  # Executed in compile time !
-  def init(options) do
-    options
-  end
-
-  #  @callback call(Plug.Conn.t, opts) :: Plug.Conn.t
-  def call(conn, _opts) do
-    conn
-    |> put_resp_content_type("text/plain")
-    |> send_resp(200, "Hello world")
-  end
-end
-```
-
-
-## test
-
-Open iex with `iex -S mix`
-
-```
-{:ok, _} = Plug.Adapters.Cowboy.http MyPlug, []
-```
-
-Open browser http://localhost:4000
-
-
-## more plug
-
-```elixir
-defmodule MyRouter do
-  use Plug.Router
-
-  plug :match
-  plug :dispatch
-
-  get "/hello" do
-    send_resp(conn, 200, "world")
-  end
-
-  forward "/users", to: UsersRouter
-
-  match _ do
-    send_resp(conn, 404, "oops")
-  end
-end
-```
-
-
-## Pattern matching
-
-```elixir
-def call(%Plug.Conn{request_path: "/" <> name} = conn, opts) do
-  send_resp(conn, 200, "Hello, #{name}")
-end
-```
-
-
-## ExUnit
-
-```elixir
-defmodule MyPlugTest do
-  use ExUnit.Case, async: true
-  use Plug.Test
-  doctest MyPlug
-
-  test "get" do
-    conn = conn(:get, "/")
-    response = MyPlug.call(conn, [])
-    assert response.status == 200
-  end
-end
-```
-
-
-## Error Reporting
-
-Let the test fail, `assert response.status == 201`
-
-
-```
-1) test get (MyPlugTest)
-   test/my_plug_test.exs:6
-   Assertion with == failed
-   code: response.status() == 201
-   lhs:  200
-   rhs:  201
-   stacktrace:
-     test/my_plug_test.exs:9: (test)
-```
-
-
-## Deployment
-
-[distillery](https://hexdocs.pm/distillery/getting-started.html)
-
-```
-defp deps do
-   [..., {:distillery, "~> 0.9.9"}]
-end
-```
-
-`mix deps.get`
-
-
-## create a release
-
-```
-my_plug (master) mix release.init  # only first time
-
-my_plug (master) $ mix release
-==> Assembling release..
-==> Building release my_plug:0.1.0 using environment dev
-==> You have set dev_mode to true, skipping archival phase
-==> Release successfully built!
-    You can run it in one of the following ways:
-      Interactive: rel/my_plug/bin/my_plug console
-      Foreground: rel/my_plug/bin/my_plug foreground
-      Daemon: rel/my_plug/bin/my_plug start
-```
-
-
-## start
-
-`rel/my_plug/bin/my_plug start`
-
-
-## hot upgrades
-
-```
-my_plug (master) $ mix release --upgrade
-Compiling 2 files (.ex)
-...
-==> Release successfully built!
-    You can run it in one of the following ways:
-      Interactive: rel/my_plug/bin/my_plug console
-      Foreground: rel/my_plug/bin/my_plug foreground
-      Daemon: rel/my_plug/bin/my_plug start
-
-my_plug (master) $ rel/my_plug/bin/my_plug upgrade 0.2.1
-Release 0.2.1 not found, attempting to unpack releases/0.2.1/my_plug.tar.gz
-Unpacked successfully: "0.2.1"
-Installed Release: 0.2.1
-Made release permanent: "0.2.1"
-```
-
-
-
 # Concurrency
 
 
@@ -2121,9 +1901,27 @@ What exit reason when sending ?
 * Process.exit(pid, :kill)
 
 
+## Exercise, Observer
+
+```
+iex> :observer.start
+```
+
+* Find the Crash process
+* Send some unknown messages
+* Find the unknown messages
+
+
+
+# What is OTP ?
+
+* Included in Erlang/Elixir
+* Framework to build fault-tolerant,scalable apps
+* Debuggers, profilers, databases etc...
+
+
 
 # OTP: GenServer
-
 
 * Generic part - behaviour
 * Specific part - callback modules
@@ -2417,65 +2215,6 @@ end
 
 
 
-# Application Behaviour
-
-
-```elixir
-defmodule MyPlug.Mixfile do
-  use Mix.Project
-
-  def project do  # Description of the project
-    [ app: :my_plug, version: "0.2.1", elixir: "~> 1.3", ...
-     deps: deps()]
-  end
-
-  # Configuration for the OTP application
-  def application do
-    [ applications: [:logger, :cowboy, :plug], # Runtime deps  
-      mod: {MyPlug, []} # The Application OTP Behaviour
-    ]
-  end
-
-  def deps: ...  # compile time deps, both erlang and elixir projects
-```
-
-
-## Application module
-
-```elixir
-defmodule MyApp do
-  use Application
-
-  def start(_type, _args) do
-    MyApp.Supervisor.start_link()
-  end
-end
-```
-
-
-## Why
-
-* Reusable components
-* Configure without recompile
-* Runtime dependencies
-* Automatic start
-
-
-## Application Configuration
-
-```
-def application do [
-  ...
-  env: [port: 5454]  # default
-]
-```
-
-or just `iex --erl "myplug port 5454" -S mix`
-
-`Application.get_env/2`
-
-
-
 # Distributed Elixir
 
 
@@ -2521,9 +2260,10 @@ iex(foo@localhost)> Node.list
 [:bar@localhost]
 iex(foo@localhost)> called = self  # using closure
 #PID<0.86.0>
-iex(foo@localhost)6> Node.spawn(:bar@localhost, fn -> send(called, {:response, "Hi"}) end)
+iex(foo@localhost)> Node.spawn(:bar@localhost,
+	fn -> send(called, {:response, "Hi"}) end)
 #PID<8914.92.0>  # Different PID !
-iex(foo@localhost)7> flush
+iex(foo@localhost)> flush
 {:response, "Hi"}
 ```
 
@@ -2549,3 +2289,309 @@ GenServer.start_link, name: {:global, :some_alias}
 
 * Multiple redundant processes
 * `GenServer.multi_call` to update all
+
+
+
+# Tools/Apps
+
+* Debugging
+* OTP Applications
+* Mix/Hex
+* Plug
+* ExUnit
+* Deployment with distillery
+
+
+## Debugging
+
+* IEx.pry
+* :debugger.start()
+* More info [here](http://blog.plataformatec.com.br/2016/04/debugging-techniques-in-elixir-lang/)
+
+
+## OTP Applications
+
+```
+Application controller
+   |          |      |
+  App1	    App2    App3
+   |          |      |
+Supervisor1   Sup2   Sup3
+```
+
+(erlang)
+
+`:application.start(:my_plug)`
+
+
+## Library Applications
+
+
+## Mix File
+
+```elixir
+defmodule MyPlug.Mixfile do
+  use Mix.Project
+
+  def project do  # Description of the project
+    [ app: :my_plug, version: "0.2.1", elixir: "~> 1.3", ...
+     deps: deps()]
+  end
+
+  # Configuration for the OTP application
+  def application do
+    [ applications: [:logger, :cowboy, :plug], # Runtime deps  
+      mod: {MyPlug, []} # The Application OTP Behaviour
+    ]
+  end
+
+  def deps: ...  # compile time deps
+```
+
+
+## OTP Application
+
+```elixir
+defmodule MyApp do
+  use Application
+
+  def start(_type, _args) do
+    MyApp.Supervisor.start_link()
+  end
+end
+```
+
+
+## Why
+
+* Reusable components
+* Configure without recompile
+* Runtime dependencies
+* Automatic start
+
+
+## Application Configuration
+
+```
+# mix file:
+def application do [
+  ...
+  env: [port: 5454]  # default
+]
+```
+
+or just
+```
+iex --erl "myplug port 5454" -S mix
+# see also Application.get_env/2
+```
+
+
+## Mix
+
+Generate a new project
+
+```
+mix new my_plug
+cd my_plug
+```
+
+
+## Add a dependency
+
+Edit `mix.exs`
+
+Add:
+
+```
+def application do
+  [applications: [:cowboy, :plug]]
+end
+
+def deps do
+  [{:cowboy, "~> 1.0.0"},
+   {:plug, "~> 1.0"}]
+end
+```
+
+
+## Download
+
+```
+mix deps.get
+mix deps.compile
+# or just: mix do deps.get, compile
+```
+
+
+## Hex
+
+The package manager for the Erlang ecosystem
+(can be used with rebar3 erlang build tool)
+
+http://hex.pm](https://hex.pm/)
+
+
+## Plug
+
+* A unified API that abstracts away the web library/framework.
+* Stackable plugs, (`conn |> plug1 |> plug2`)
+
+
+## Cowboy
+
+* Small, fast, modular HTTP server written in Erlang
+
+
+## Plug Example
+
+Add to lib/my_plug.ex:
+
+```elixir
+defmodule MyPlug do
+  import Plug.Conn
+
+  # Executed in compile time !
+  def init(options) do
+    options
+  end
+
+  #  @callback call(Plug.Conn.t, opts) :: Plug.Conn.t
+  def call(conn, _opts) do
+    conn
+    |> put_resp_content_type("text/plain")
+    |> send_resp(200, "Hello world")
+  end
+end
+```
+
+
+## test
+
+Open iex with `iex -S mix`
+
+```
+{:ok, _} = Plug.Adapters.Cowboy.http MyPlug, []
+```
+
+Open browser http://localhost:4000
+
+
+## more plug
+
+```elixir
+defmodule MyRouter do
+  use Plug.Router
+
+  plug :match
+  plug :dispatch
+
+  get "/hello" do
+    send_resp(conn, 200, "world")
+  end
+
+  forward "/users", to: UsersRouter
+
+  match _ do
+    send_resp(conn, 404, "oops")
+  end
+end
+```
+
+
+## Pattern matching
+
+```elixir
+def call(%Plug.Conn{request_path: "/" <> name} = conn, opts) do
+  send_resp(conn, 200, "Hello, #{name}")
+end
+```
+
+
+## ExUnit
+
+```elixir
+defmodule MyPlugTest do
+  use ExUnit.Case, async: true
+  use Plug.Test
+  doctest MyPlug
+
+  test "get" do
+    conn = conn(:get, "/")
+    response = MyPlug.call(conn, [])
+    assert response.status == 200
+  end
+end
+```
+
+
+## Error Reporting
+
+Let the test fail, `assert response.status == 201`
+
+
+```
+1) test get (MyPlugTest)
+   test/my_plug_test.exs:6
+   Assertion with == failed
+   code: response.status() == 201
+   lhs:  200
+   rhs:  201
+   stacktrace:
+     test/my_plug_test.exs:9: (test)
+```
+
+
+## Deployment
+
+[distillery](https://hexdocs.pm/distillery/getting-started.html)
+
+```
+defp deps do
+   [..., {:distillery, "~> 0.9.9"}]
+end
+```
+
+`mix deps.get`
+
+
+## create a release
+
+```
+my_plug (master) mix release.init  # only first time
+
+my_plug (master) $ mix release
+==> Assembling release..
+==> Building release my_plug:0.1.0 using environment dev
+==> You have set dev_mode to true, skipping archival phase
+==> Release successfully built!
+    You can run it in one of the following ways:
+      Interactive: rel/my_plug/bin/my_plug console
+      Foreground: rel/my_plug/bin/my_plug foreground
+      Daemon: rel/my_plug/bin/my_plug start
+```
+
+
+## start
+
+`rel/my_plug/bin/my_plug start`
+
+
+## hot upgrades
+
+```
+my_plug (master) $ mix release --upgrade
+Compiling 2 files (.ex)
+...
+==> Release successfully built!
+    You can run it in one of the following ways:
+      Interactive: rel/my_plug/bin/my_plug console
+      Foreground: rel/my_plug/bin/my_plug foreground
+      Daemon: rel/my_plug/bin/my_plug start
+
+my_plug (master) $ rel/my_plug/bin/my_plug upgrade 0.2.1
+Release 0.2.1 not found, attempting to unpack releases/0.2.1/my_plug.tar.gz
+Unpacked successfully: "0.2.1"
+Installed Release: 0.2.1
+Made release permanent: "0.2.1"
+```
