@@ -1346,12 +1346,12 @@ Similar to Enum but supports lazy operations.
 ## Basic Type
 
 Examples, type ::
-* any()
-* none()
-* pid()
-* atom()
-* integer()
-* pos_integer
+* `any`
+* `none`
+* `pid`
+* `atom`
+* `integer`
+* `pos_integer`
 
 
 ## Literals
@@ -1365,7 +1365,7 @@ Examples, type ::
 * {:ok, type}  
 
 
-## Module TYpes
+## Module Types
 
 Example:
 * Range.t
@@ -1379,7 +1379,9 @@ Example:
 
   `@type type_name :: type`
 
-* Example of parameterized definition
+* Example
+
+  `@type mytype :: 1..30 | atom`
 
   `@type dict(key, value) :: [{key, value}]`
 
@@ -1406,6 +1408,39 @@ defmodule LousyCalculator do
   @spec multiply(number, number) :: number_with_remark
   def multiply(x, y), do: {x * y, "It is like addition on steroids."}
 end
+```
+
+
+## Dialyzer
+
+* Static analysis tool
+* analyze the BEAM files
+* can be useful even without @specs
+* Persistent Lookup Table
+
+
+## Running Dialyzer
+
+```elixir
+def run, do: some_op(5, :you)
+def some_op(a,b), do: a + b
+```
+
+
+## Output
+
+```
+typeexample (master) $ mix dialyzer
+Starting Dialyzer
+dialyzer --no_check_plt --plt /Users/andreasronge/.dialyxir_core_19_1.3.2.plt -Wunmatched_returns -Werror_handling -Wrace_conditions -Wunderspecs /Users/andreasronge/projects/elixir/presentation/dev-happiness-elixir/typespecs/typeexample/_build/dev/lib/typeexample/ebin
+  Proceeding with analysis...
+typeexample.ex:3: Function run/0 has no local return
+typeexample.ex:3: The call 'Elixir.Typeexample':some_op(5,'you') will
+never return since it differs in the 2nd argument from the success
+typing arguments: (number(),number())
+ done in 0m1.35s
+done (warnings were emitted)
+
 ```
 
 
@@ -1450,20 +1485,18 @@ hej
 MFA - module, function, arguments list
 
 
-## Example, API
+## Example
 
 ```elixir
 defmodule Greeter do
   @callback say_hello(String.t) :: any
   @callback say_goodbye(String.t) :: any
 end
-
 defmodule NormalGreeter do
   @behaviour Greeter
   def say_hello(name), do: IO.puts "Hello, #{name}"
   def say_goodbye(name), do: IO.puts "Goodbye, #{name}"
 end
-
 defmodule HelloAll do
   def hello_to_all(greeters) do
     greeters |> Enum.each(& &1.say_hello("andreas"))
@@ -1783,6 +1816,23 @@ end
 ```
 
 
+## Error Reporting
+
+Let the test fail, `assert response.status == 201`
+
+
+```
+1) test get (MyPlugTest)
+   test/my_plug_test.exs:6
+   Assertion with == failed
+   code: response.status() == 201
+   lhs:  200
+   rhs:  201
+   stacktrace:
+     test/my_plug_test.exs:9: (test)
+```
+
+
 ## Deployment
 
 [distillery](https://hexdocs.pm/distillery/getting-started.html)
@@ -1849,7 +1899,12 @@ Made release permanent: "0.2.1"
 * extremely lightweight
 * takes advantage of a multi-core or multi-CPU computer
 * each process has a private heap that is garbage collected independently
+* preemptive scheduling
 
+
+(source [Erlang Factory](http://www.erlang-factory.com/upload/presentations/105/KennethLundin-ErlangFactory2009London-AboutErlangOTPandMulti-coreperformanceinparticular.pdf))
+
+[<img src="img/erlang-smp.png">](img/erlang-smp.png)
 
 ## Creating a new process
 
