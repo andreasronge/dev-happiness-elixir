@@ -2086,6 +2086,8 @@ What happened ?
 * Manages one or more worker processes or supervisors
 * Handles process exits, e.g. with a restart
 * Impl. the GenServer behaviour
+* Replace crashed processes with new  (let it crash)
+* Supervisor trees
 
 
 ## callbacks
@@ -2200,6 +2202,12 @@ end
 ```
 
 
+## Exercise
+
+* In IEx, compile  [my_stack_supervisor.ex](https://github.com/andreasronge/dev-happiness-elixir/blob/master/concurrency/my_stack_supervisor.ex)
+* What happens when you pop the last item on the stack ?
+
+
 ## Multiple Children
 
 * How to get PIDs ?
@@ -2226,7 +2234,7 @@ Connecting nodes to clusters
 iex --sname foo@localhost
 iex(foo@localhost)> Node.connect :bar@localhost
 true
-iex(foo@localhost)2> Node.list
+iex(foo@localhost)> Node.list
 [:bar@localhost]
 ```
 
