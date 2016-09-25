@@ -1902,9 +1902,16 @@ Made release permanent: "0.2.1"
 * preemptive scheduling
 
 
+## I/O Calls
+
+* the calling process is preempted
+* A separate async threads
+
+
 (source [Erlang Factory](http://www.erlang-factory.com/upload/presentations/105/KennethLundin-ErlangFactory2009London-AboutErlangOTPandMulti-coreperformanceinparticular.pdf))
 
 [<img src="img/erlang-smp.png">](img/erlang-smp.png)
+
 
 ## Creating a new process
 
@@ -2039,34 +2046,79 @@ res + Task.await(task)
 ```
 
 
-## When a process dies
+## Exit Signals
 
-* When a process reaches its end, it exits with reason `:normal`.
-* Call `exit/1` if you want to terminate a process but not signal any failure:
+* Normal exit, normally ignored (reason: `:normal`)
+* Unhandled Error (e.g. matching error)
+* Killed (another process sends exit with reason `:kill`)
+
+
+## Linking
+
+* If two processes are linked then they will receive the others exit signal
+
 * If the exit reason is not `:normal`, all the processes linked to the process that
 exited will crash (unless they are trapping exits).
 
+
+```elixir
+defmodule Crash do
+  def start_link, do: spawn_link(__MODULE__, :loop, [])
+  def ohh(pid), do: send(pid, :ohh)
+
+  def loop do
+    receive do
+      :ohh -> throw "Ohh"
+    end
+  end
 ```
-iex(42)> exit(:oj)
-** (exit) :oj  # crash and restart iex
+
+```
+iex> p = Crash.start_link
+iex> Crash.ohh(p)
+** (EXIT from #PID<0.80.0>) an exception was raised:
+** (ErlangError) erlang error: {:nocatch, "Ohh"}
+    crash.ex:21: Crash.loop/0
+
+20:29:22.708 [error] Process #PID<0.157.0> raised an exception
+(ErlangError) erlang error: {:nocatch, "Ohh"}
+    crash.ex:21: Crash.loop/0
+Interactive Elixir (1.3.2) - press Ctrl+C to exit (type h() ENTER for help)
 ```
 
 
-## Linking and Trapping
+## Trapping exists
 
 ```
 iex> Process.flag(:trap_exit, true)
-iex> pid = spawn_link(MyState, :loop, [%{}])
-iex> send(pid, :unknown)
+iex> p = Crash.start_link
+iex> Crash.ohh(p)
+iex>
+20:37:36.700 [error] Process #PID<0.165.0> raised an exception
+** (ErlangError) erlang error: {:nocatch, "Ohh"}
+    crash.ex:21: Crash.loop/0
 iex> flush
-{:EXIT, #PID<0.162.0>, :normal}
-
-# or kill it
-iex> pid = spawn_link(MyState, :loop, [%{}])
-iex> Process.exit(pid, :kill)
-iex> flush
-{:EXIT, #PID<0.166.0>, :killed}
+{:EXIT, #PID<0.165.0>,
+ {{:nocatch, "Ohh"}, [{Crash, :loop, 0, [file: 'crash.ex', line: 21]}]}}
 ```
+
+
+## Exercise, trapping
+
+```elixir
+receive do
+	:hi -> loop
+	:bye -> IO.puts "Bye"
+	:ohh -> throw "Ohh"
+end
+```
+
+What exit reason when sending ?
+* `:bye`
+* `:ohh`
+* `:hi`
+* Process.exit(pid, :bla)
+* Process.exit(pid, :kill)
 
 
 
