@@ -70,16 +70,39 @@ Design for:
 * Functional Programming
 * Actor Model (independent discovery)
 * OTP patterns, e.g. supervisor behaviour
+* Erlang VM
+
+
+## Who uses it
+Examples
+
+* Companies:
+
+	Amazon, Yahoo, WhatsApp, Ericsson
+
+* Type of products:
+
+	Game Servers, Distributed DB, message brokers
+
+* Open source
+
+	CouchDB, Riak, RabbitMQ, ejabberd,
+
+
+## Who cares ?
+
+Do you need it ?
+* Support 2,277,845 simultaneous TCP connections on one machine
+* Downtime of 1 sec per 20 year
 
 
 ## Why Elixir
 
-* Make Erlang & tools more accessible
-* Meta programming
-* Extendable language: Polymorphism
-* Pipeline operator
-* Fantastic elixir libraries, mix, hex
-* Fun !
+* Extensible design (macros, protocols)
+* Great elixir ecosystem and tooling
+* Built on Erlang Runtime
+* Compatible with Erlang's ecosystem
+* Fun and productive language !
 
 
 ## Future
@@ -90,6 +113,7 @@ Design for:
 * Fashion and who will we listen to ?
 * Syntax matters
 * Finding jobs/developers
+* [Elixir companies](https://github.com/doomspork/elixir-companies)
 
 
 ## Fun driven development
@@ -985,15 +1009,6 @@ Which will match when `x = 4` ?
 ```
 
 
-## Strings
-(binaries)
-
-```elixir
-"hej" <> hopp  = "hejhopp"
-[h| t] = to_char_list("abcd")
-```
-
-
 ## Head and Tails
 
 ```
@@ -1243,6 +1258,17 @@ end
 Guard.what_is(99) # => 99 is a number
 Guard.what_is(:cat) # => cat is an atom
 Guard.what_is([1,2,3]) # => [1,2,3] is a list
+```
+
+
+## Strings/Binaries
+
+```elixir
+"hej" <> hopp  = "hejhopp"
+[h| t] = to_char_list("abcd")
+
+ <<0, 1, x>> = <<0, 1, 2>> # match 3 bytes
+ <<0, 1, x :: binary>> = <<0, 1, 2, 3>>  #
 ```
 
 
