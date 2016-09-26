@@ -1005,6 +1005,10 @@ iex> h
 1
 iex> t
 [2, 3, 4]
+iex> hd(a)  # head
+1
+iex> tl(a)  # tail
+[2, 3, 4]
 ```
 
 
@@ -1041,6 +1045,9 @@ iex> [{name, _} | _] = icecreams
 [{"cookies", 5}, {"chocolate", 3}, {"mint", 4}]
 iex> name
 "cookies"
+
+# What does this do ?
+iex>[f={_, c}|t] = icecreams
 ```
 
 
@@ -1057,14 +1064,13 @@ iex> with {:ok, width} <- Map.fetch(opts, :width),
 ```
 
 
-## Advanced pattern matching
-
-What does this do ?
-[PragProg Example](https://media.pragprog.com/titles/elixir/lists.pdf)
+## Function argument
 
 ```elixir
-def for_location([ head = [_, target_loc, _, _ ] | tail], target_loc) do
- [ head | for_location(tail, target_loc) ]
+defmodule Bar do
+	def hi("hi"), do: "ho"
+	def hi(1), do: "one"
+	def hi(x), do: "got #{x}"
 end
 ```
 
@@ -1075,6 +1081,32 @@ end
 defmodule MyList do
   def len([]), do: 0
   def len([_head | tail]), do: 1 + len(tail)
+end
+```
+
+* Is `len` tail-recursive ?
+* If not how to impl. it ?
+
+
+## More Recursion
+
+```elixir
+defmodule Fib do
+  def fib(0) do 0 end
+  def fib(1) do 1 end
+  def fib(n) do fib(n-1) + fib(n-2) end
+end
+```
+
+
+## Advanced pattern matching
+
+What does this do ?
+[PragProg Example](https://media.pragprog.com/titles/elixir/lists.pdf)
+
+```elixir
+def for_location([ head = [_, target_loc, _, _ ] | tail], target_loc) do
+ [ head | for_location(tail, target_loc) ]
 end
 ```
 
@@ -1130,17 +1162,6 @@ Solution: `{_, a} = {:foo, :bar}`
 
 # d)
 [{_, %{name: a}}] = [{3, %{name: "kalle"}}]  
-```
-
-
-## Functions args
-
-```elixir
-defmodule Fib do
-  def fib(0) do 0 end
-  def fib(1) do 1 end
-  def fib(n) do fib(n-1) + fib(n-2) end
-end
 ```
 
 
@@ -2354,6 +2375,43 @@ defmodule MyPlug.Mixfile do
   end
 
   def deps: ...  # compile time deps
+```
+
+
+##  Runtime deps
+
+```
+my_plug (master) $ mix app.tree
+my_plug
+├── elixir
+├── logger
+│   └── elixir
+├── cowboy
+│   ├── ranch
+│   ├── cowlib
+│   │   └── crypto
+│   └── crypto
+└── plug
+    ├── elixir
+    ├── crypto
+    ├── logger
+    └── mime
+        └── elixir
+```
+
+
+## Compiletime deps
+
+```				
+my_plug (master) $ mix deps.tree
+my_plug
+├── cowboy ~> 1.0.0 (Hex package)
+│   ├── cowlib ~> 1.0.0 (Hex package)
+│   └── ranch ~> 1.0 (Hex package)
+├── plug ~> 1.0 (Hex package)
+│   ├── cowboy ~> 1.0 (Hex package)
+│   └── mime ~> 1.0 (Hex package)
+└── distillery ~> 0.9.9 (Hex package)
 ```
 
 
