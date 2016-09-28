@@ -4,7 +4,6 @@
 Andreas Ronge (@ronge)
 
 
-
 # Contents
 
 * Introduction
@@ -1901,24 +1900,24 @@ exited will crash (unless they are trapping exits).
 ```elixir
 defmodule Crash do
   def start_link, do: spawn_link(__MODULE__, :loop, [])
-  def ohh(pid), do: send(pid, :ohh)
+  def boom(pid), do: send(pid, :boom)
 
   def loop do
     receive do
-      :ohh -> throw "Ohh"
+      :boom -> throw "Boom"
     end
   end
 ```
 
 ```
 iex> p = Crash.start_link
-iex> Crash.ohh(p)
+iex> Crash.boom(p)
 ** (EXIT from #PID<0.80.0>) an exception was raised:
-** (ErlangError) erlang error: {:nocatch, "Ohh"}
+** (ErlangError) erlang error: {:nocatch, "Boom"}
     crash.ex:21: Crash.loop/0
 
 20:29:22.708 [error] Process #PID<0.157.0> raised an exception
-(ErlangError) erlang error: {:nocatch, "Ohh"}
+(ErlangError) erlang error: {:nocatch, "Boom"}
     crash.ex:21: Crash.loop/0
 Interactive Elixir (1.3.2) - press Ctrl+C to exit (type h() ENTER for help)
 ```
@@ -1929,14 +1928,14 @@ Interactive Elixir (1.3.2) - press Ctrl+C to exit (type h() ENTER for help)
 ```
 iex> Process.flag(:trap_exit, true)
 iex> p = Crash.start_link
-iex> Crash.ohh(p)
+iex> Crash.boom(p)
 iex>
 20:37:36.700 [error] Process #PID<0.165.0> raised an exception
-** (ErlangError) erlang error: {:nocatch, "Ohh"}
+** (ErlangError) erlang error: {:nocatch, "Boom"}
     crash.ex:21: Crash.loop/0
 iex> flush
 {:EXIT, #PID<0.165.0>,
- {{:nocatch, "Ohh"}, [{Crash, :loop, 0, [file: 'crash.ex', line: 21]}]}}
+ {{:nocatch, "boom"}, [{Crash, :loop, 0, [file: 'crash.ex', line: 21]}]}}
 ```
 
 
@@ -1946,13 +1945,13 @@ iex> flush
 receive do
 	:hi -> loop
 	:bye -> IO.puts "Bye"
-	:ohh -> throw "Ohh"
+	:boom -> throw "Boom"
 end
 ```
 
 What exit reason when sending ?
 * `:bye`
-* `:ohh`
+* `:boom`
 * `:hi`
 * Process.exit(pid, :bla)
 * Process.exit(pid, :kill)
@@ -1975,7 +1974,6 @@ iex> :observer.start
 * Included in Erlang/Elixir
 * Framework to build fault-tolerant,scalable apps
 * Debuggers, profilers, databases etc...
-
 
 
 # OTP: GenServer
