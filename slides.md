@@ -58,7 +58,7 @@ Andreas Ronge (@ronge)
 
 Design for:
 * Fault-tolerant
-* Highly availability
+* High availability
 * Hot code replacement
 * Self healing network
 * Distributed
@@ -69,7 +69,7 @@ Design for:
 
 * Functional Programming
 * Actor Model (independent discovery)
-* OTP patterns, e.g. supervisor behaviour
+* OTP, e.g. supervisor behaviour
 * Erlang VM
 
 
@@ -100,20 +100,30 @@ Do you need it ?
 
 * Extensible design (macros, protocols)
 * Great elixir ecosystem and tooling
+* Easy to learn/use FP language
+* Syntax matters
 * Built on Erlang Runtime
-* Compatible with Erlang's ecosystem
 * Fun and productive language !
 
 
-## Future
+## Future ?
 
-* Future of functional programming ?
-* What's the future of the JVM ?
-* What type of application will we need to build ?
-* Fashion and who will we listen to ?
-* Syntax matters
-* Finding jobs/developers
-* [Elixir companies](https://github.com/doomspork/elixir-companies)
+* Parameters:
+  * Future of functional programming ?
+  * Future of the JVM ?
+  * What type of applications needs to be build ?
+	  * e.g. realtime, concurrent connections ?
+  * Evangelists ?
+  * [Learning resources](https://github.com/elixir-lang/elixir/wiki)
+  * Success stories
+
+
+## Elixir Popularity
+
+* Job market/ecosystem is growing
+  * [jobs/alchemists](http://plataformatec.com.br/elixir-radar/jobs)
+  * [Elixir companies](https://github.com/doomspork/elixir-companies)
+  * [Elixir libraries/tools](https://github.com/h4cc/awesome-elixir) and [hex.pm](https://hex.pm/)
 
 
 ## Fun driven development
@@ -2409,20 +2419,20 @@ defmodule MyPlug.Mixfile do
 ```
 my_plug (master) $ mix app.tree
 my_plug
-├── elixir
-├── logger
-│   └── elixir
-├── cowboy
-│   ├── ranch
-│   ├── cowlib
-│   │   └── crypto
-│   └── crypto
-└── plug
-    ├── elixir
-    ├── crypto
-    ├── logger
-    └── mime
-        └── elixir
++-- elixir
++-- logger
+|   +-- elixir
++-- cowboy
+|   +-- ranch
+|   +-- cowlib
+|   |   +-- crypto
+|   +-- crypto
++-- plug
+    +-- elixir
+    +-- crypto
+    +-- logger
+    +-- mime
+        +-- elixir
 ```
 
 
@@ -2431,13 +2441,13 @@ my_plug
 ```				
 my_plug (master) $ mix deps.tree
 my_plug
-├── cowboy ~> 1.0.0 (Hex package)
-│   ├── cowlib ~> 1.0.0 (Hex package)
-│   └── ranch ~> 1.0 (Hex package)
-├── plug ~> 1.0 (Hex package)
-│   ├── cowboy ~> 1.0 (Hex package)
-│   └── mime ~> 1.0 (Hex package)
-└── distillery ~> 0.9.9 (Hex package)
++-- cowboy ~> 1.0.0 (Hex package)
+|   +-- cowlib ~> 1.0.0 (Hex package)
+|   +-- ranch ~> 1.0 (Hex package)
++-- plug ~> 1.0 (Hex package)
+|   +-- cowboy ~> 1.0 (Hex package)
+|   +-- mime ~> 1.0 (Hex package)+
++-- distillery ~> 0.9.9 (Hex package)
 ```
 
 
@@ -2521,7 +2531,7 @@ mix deps.compile
 The package manager for the Erlang ecosystem
 (can be used with rebar3 erlang build tool)
 
-http://hex.pm](https://hex.pm/)
+[http://hex.pm](https://hex.pm/)
 
 
 ## Plug
