@@ -99,6 +99,7 @@ Do you need it ?
 
 * Extensible design (macros, protocols)
 * Great elixir ecosystem and tooling
+* Phoenix Web Framework
 * Easy to learn/use FP language
 * Syntax matters
 * Built on Erlang Runtime
@@ -264,6 +265,12 @@ connection
 |> controller
 ```
 
+
+## Range
+
+```elixir
+1..4
+```
 
 
 # Data Types
@@ -1568,6 +1575,16 @@ Polymorphism in Elixir
 Extending external modules
 
 
+## Example
+
+Enum protocol - iterate over different args.
+
+```elixir
+Enum.map [1, 2, 3], fn x -> x * x end # [1, 4, 9]
+Enum.map 1..3, fn x -> x * x end # [1, 4, 9]
+```
+
+
 ## defprotocol
 
 To define a new
@@ -2369,6 +2386,7 @@ GenServer.start_link, name: {:global, :some_alias}
 
 * IEx.pry
 * :debugger.start()
+* IO.inspect
 * More info [here](http://blog.plataformatec.com.br/2016/04/debugging-techniques-in-elixir-lang/)
 
 
