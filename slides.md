@@ -273,6 +273,7 @@ connection
 ```
 
 
+
 # Data Types
 
 
@@ -348,8 +349,7 @@ Reference modules
 
 ## string
 
-Single-quoted and double quoted
-
+* Double quoted
 * Holds UTF-8 characters
 * Escapes sequences, `\n`, `\a`, ...
 * Allows interpolation, `#{}` syntax
@@ -357,6 +357,27 @@ Single-quoted and double quoted
 ```elixir
 name = "andreas"
 IO.puts "Hello #{String.capitalize name}"
+```
+
+
+## string
+
+```text
+iex> i "123"
+Term
+  "123"
+Data type
+  BitString
+Byte size
+  3
+Description
+  This is a string: a UTF-8 encoded binary.
+  It's printed surrounded by "double quotes" because all UTF-8
+  encoded codepoints in it are printable.
+Raw representation
+  <<49, 50, 51>>
+Reference modules
+  String, :binary
 ```
 
 
@@ -409,33 +430,6 @@ Enum.reverse(a) # => 'cba'
  ```
 
 
-## string
-
-```text
-iex> i "123"
-Term
-  "123"
-Data type
-  BitString
-Byte size
-  3
-Description
-  This is a string: a UTF-8 encoded binary.
-  It's printed surrounded by "double quotes" because all UTF-8
-  encoded codepoints in it are printable.
-Raw representation
-  <<49, 50, 51>>
-Reference modules
-  String, :binary
-```
-
-```text
-byte_size "abc" # => 3
-byte_size "ÄÄÄ" : # => 6
-length 'ÄÄÄ' # => 3
-```
-
-
 ## Sigils
 
 Some more sigils:
@@ -480,6 +474,9 @@ iex> << 1::size(2), 1::size(3) >>
 
 iex> bit_size(<<2.5::float>>)
 64
+
+iex> <<72, 69, 74>>
+"HEJ"  (!!!)
 ```
 
 
