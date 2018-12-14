@@ -21,6 +21,7 @@ Andreas Ronge (@ronge)
 * Pattern Matching
 * Comprehension
 * Control Flow
+* Documentation
 * Typespecs
 * Behaviours
 * Protocols
@@ -1183,6 +1184,15 @@ end
 ```
 
 
+## String pattern matching
+
+```elixir
+def greet("Ben" <> _) do
+ IO.puts("Hello, Ben")
+end
+```
+
+
 ## Keyword List
 
 Rarely done since pattern matching on lists requires the number of items and their order to match
@@ -1588,6 +1598,33 @@ end
 
 
 
+# Documentation
+
+```elixir
+defmodule MyApp.Hello do
+  @moduledoc """
+  This is the Hello module.
+  """
+
+  @doc """
+  Says hello to the given `name`.
+
+  Returns `:ok`.
+
+  ## Examples
+
+      iex> MyApp.Hello.world(:john)
+      :ok
+
+  """
+  def world(name) do
+    IO.puts "hello #{name}"
+  end
+end
+```
+
+
+
 # Behaviours
 
 * A list of functions
@@ -1798,6 +1835,12 @@ end
 
 # Macros
 
+Considered to be bad style to use them when they’re not necessary.
+Macros should only be used as a last resort.
+
+Can be used to override the built-in macros such as:
+`unless/2, defmacro/2, def/2, defprotocol/2 ...` (but please don't :)
+
 
 ## Example
 
@@ -1845,6 +1888,116 @@ defmodule MyModule do
 end
 
 MyModule.say_hello
+```
+
+
+## Quote
+
+```
+iex(4)> expr = quote do: IO.puts("HEJ")
+{{:., [], [{:__aliases__, [alias: false], [:IO]}, :puts]}, [], ["HEJ"]}
+```
+
+
+## Unquote
+
+```
+iex(1)> number = 3
+iex(2)> quote do: 2 + unquote(number)
+{:+, [context: Elixir, import: Kernel], [2, 3]}
+```
+
+
+## AST argument
+
+```elixir
+defmacro nice_print({:+, _meta, [lhs, rhs]}) do
+ ...
+```
+
+```
+iex(2)> MyMacros.nice_print 2 + 3
+  2
++ 3
+  --
+  5
+```
+
+[complete example](https://hackernoon.com/understanding-elixir-macros-3464e141434c)
+
+
+## Unquote Example 2
+
+```elixir
+defmodule Unless do
+  defmacro macro_unless(clause, do: expression) do
+    quote do
+      if(!unquote(clause), do: unquote(expression))
+    end
+  end
+end
+```
+
+```
+iex(2)> require Unless
+iex(3)> Unless.macro_unless false, do: IO.puts "this should never be printed"
+this should never be printed
+```
+
+
+## Exercise
+
+Impl. macro `resource` so that:
+
+```elixir
+defmodule Router do
+  use Resources
+  resources "/users", UserController 
+```
+    
+generates `route` function so that
+```
+  Router.route('/users')   # => UserController.index()
+  Router.route('/users/2') # => UserController.show(2)
+```
+
+
+## Usage Example
+
+```elixir
+defmodule UserController do
+  def index, do: IO.puts("Index")
+  def get(arg), do: IO.puts("Get #{arg}")
+end
+
+defmodule Router do
+  use Resources
+  resources "/users", UserController
+end
+
+#  Router.route("/users/42")
+```
+
+
+## My Solution
+
+```elixir
+defmodule Resources do
+  defmacro __using__(_) do
+    quote do
+      import Resources
+    end
+  end
+  defmacro resources(path, ctrl) do
+    quote do
+      def route(unquote(path)), do: route(unquote(ctrl), :index)
+      def route(unquote(path) <> "/" <> param), do: route(unquote(ctrl), :get, [param])
+    end
+  end
+  def route(ctrl, method, param \\ []) do
+    apply(ctrl, method, param)
+  end
+end
 ```
 
 
