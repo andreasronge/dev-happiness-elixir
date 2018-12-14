@@ -688,6 +688,18 @@ iex(36)> %Person{me | name: "you"}
 
 ```
 
+## Required Keys
+
+```
+defmodule Car do
+  @enforce_keys [:make]
+  defstruct [:model, :make]
+end
+
+iex> %Car{}
+** (ArgumentError) the following keys must also be given when building struct Car: [:make]
+```
+
 
 ## Compile time checks
 
@@ -828,6 +840,18 @@ defmodule Example do
   end
 end
 ```
+
+
+## Calling Erlang
+
+Syntax: `<atom>.<function>([args])`
+
+```elixir
+:erlang.element(1, {1,2,3,4})
+:random.uniform()
+```
+
+Btw, autocomplete in IRB works
 
 
 ## Conventions
@@ -1091,6 +1115,9 @@ iex> with {:ok, width} <- Map.fetch(opts, :width),
 {:ok, 150}
 ```
 
+[Kernel.SpecialForms.html#with/1](https://hexdocs.pm/elixir/Kernel.SpecialForms.html#with/1)
+
+
 
 ## Function argument
 
@@ -1099,6 +1126,17 @@ defmodule Bar do
 	def hi("hi"), do: "ho"
 	def hi(1), do: "one"
 	def hi(x), do: "got #{x}"
+end
+```
+
+
+## Default parameters
+
+```elixir
+@defaults %{color: "black", shape: "circle"}
+def draw(options \\ [] ) do
+  %{color: color, shape: shape} = Enum.into(options, @defaults)
+  IO.puts("Draw a #{color} #{shape}")
 end
 ```
 
@@ -1133,8 +1171,14 @@ What does this do ?
 [PragProg Example](https://media.pragprog.com/titles/elixir/lists.pdf)
 
 ```elixir
-def for_location([ head = [_, target_loc, _, _ ] | tail], target_loc) do
- [ head | for_location(tail, target_loc) ]
+# Example of data: [ timestamp, location_id, temperature, rainfall ]
+defmodule WeatherHistory do
+
+  def for_location([], target_loc), do: []
+  def for_location([ head = [_, target_loc, _, _ ] | tail], target_loc) do
+   [ head | for_location(tail, target_loc) ]
+  end
+  def for_location([ _ | tail], target_loc), do: for_location(tail, target_loc)
 end
 ```
 
@@ -1193,17 +1237,30 @@ Solution: `{_, a} = {:foo, :bar}`
 ```
 
 
-## Nested function args
+## Matching function args
 
 ```
 iex> f = fn({_, price}) -> price end
 iex> f.({"vanilla", 3})             
 3
+```
 
+
+## Exercies
+
+Impl first_name so that:
+```elixir
 iex> icecreams = [{"cookies", 5}, {"chocolate", 3}, {"mint", 4}]
 [{"cookies", 5}, {"chocolate", 3}, {"mint", 4}]
 iex> first_name.(icecreams)
 "cookies"
+```
+
+
+## Answers
+
+```elixir
+first_name = fn([{name, _}|_]) -> name end
 ```
 
 
@@ -1244,12 +1301,24 @@ Do not use `Enum`, use recursion
 
 * Return the length of the array
 * Get the total price of all ice creams
+* Create a module: Price
 
 ```
 icecreams = [{"cookies", 5}, {"chocolate", 3}, {"mint", 4}]
 ```
 
 (Erlang has tail call optimization)
+
+
+## Solution
+
+```elixir
+defmodule Price do
+  def calc(list), do: calc(list, 0)
+  def calc([], sum), do: sum
+  def calc([{_, price} | t], sum), do: calc(t, sum + price)
+end
+```
 
 
 ## Guards
@@ -1566,6 +1635,37 @@ HelloAll.hello_to_all([NormalGreeter])
 ```
 
 
+## Excerices
+
+Specify one behaviour `Parser` and one implementation of that `JSONParser` so that
+  
+```
+JSONParser.parse("foo") -> {:ok, "foobar"}  # use hard coded values
+Parser.parse!(JSONParser, "foo") -> "foobar"  # use hard coded values
+```
+
+What happens if JSONParser does not return correct tuple type ?
+
+
+## Answer
+
+```elixir
+defmodule Parser do
+  @callback parse(String.t) :: {:ok, term} | {:error, String.t}
+
+  def parse!(implementation, contents) do
+    case implementation.parse(contents) do
+      {:ok, data} -> data
+      {:error, error} -> raise ArgumentError, "parsing error: #{error}"
+    end
+  end
+end
+```
+
+https://elixir-lang.org/getting-started/typespecs-and-behaviours.html
+
+note: term - any type
+
 
 # Protocols
 Polymorphism in Elixir
@@ -1607,12 +1707,34 @@ defimpl Blank, for: List do
  def blank?([]), do: true
  def blank?(_),  do: false
 end
+
+# Question, what happens:
+Blank.blank?("hej")
+
 ```
 
 
-## Extending Existing Protocols
+## The Enumerable Protocol
 
-The Collectable Protocol
+How can Enum work on different data structures ?
+
+```elxir
+Enum.count(1..3) 
+Enum.count([1,2,3])
+```
+
+
+## Enum.map/2
+
+```elixir
+def map(enumerable, fun) do
+  reducer = fn x, acc -> {:cont, [fun.(x) | acc]} end
+  Enumerable.reduce(enumerable, {:cont, []}, reducer) |> elem(1) |> :lists.reverse()
+end
+```
+
+
+## The Collectable Protocol
 
 ```elixir
 Enum.into([1,2,3], %{}, &({&1,&1*2}))
