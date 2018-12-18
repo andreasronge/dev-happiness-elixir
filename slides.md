@@ -1627,11 +1627,22 @@ end
 
 # Behaviours
 
-* A list of functions
-* Compile time checked
-* Similar to Java interfaces
+* Enables:
+  * define a set of functions that have to be implemented
+  * ensure that a module implements all the functions
+* Compile time checks of function specifications 
 * Defined with @callback
 * Abstract generic functionalities
+
+
+## Behaviour and OTP
+
+Behaviours are formalizations of these common patterns. 
+Divide the code for a process in a 
+* generic part (a behaviour module) 
+* specific part (a callback module).
+
+note: British spelling
 
 
 ## Dynamic Invocation
@@ -2081,7 +2092,7 @@ end
 ```
 
 
-## How keep process alive
+## How keep process alive ?
 
 we want to send another message
 
@@ -2118,7 +2129,7 @@ Create a process that holds state so that:
 
 ```
 iex> pid = spawn(MyState, :loop, [%{bar: "foo"}])
-iex> send(pid, {:get, :bar})
+iex> send(pid, {:get, :bar, self()})
 iex> flush
 "foo"
 iex> send(pid, {:set, :bar, "baaz"})
@@ -2173,9 +2184,10 @@ res + Task.await(task)
 
 ## Exit Signals
 
-* Normal exit, normally ignored (reason: `:normal`)
-* Unhandled Error (e.g. matching error)
-* Killed (another process sends exit with reason `:kill`)
+A process can terminate for 3 reasons:
+1. Normal exit, normally ignored (reason: `:normal`)
+2. Unhandled Error (e.g. matching error)
+3. Killed (another process sends exit with reason `:kill`)
 
 
 ## Linking
@@ -2232,7 +2244,7 @@ iex> flush
 
 ```elixir
 receive do
-	:hi -> loop
+	:hi -> loop()
 	:bye -> IO.puts "Bye"
 	:boom -> throw "Boom"
 end
@@ -2383,6 +2395,139 @@ iex> MyStack.pop(pid)
 ```
 
 
+## Exercise, start_link
+
+Impl. a very naive GenServer  
+```elixir
+defmodule MyGenServer do
+  def start_link(module, args) do
+    # TODO
+    # Calls init/1 function of the given module which returns state
+    # Starts a process linked to the current process calling MyGenServer.loop with state as arg
+    # Returns {:ok, pid}
+  end
+
+  def loop(state) do
+  end
+```
+
+
+## Solution
+
+```elixir
+defmodule MyGenServer do
+  def start_link(module, args) do
+    {:ok, state} = module.init(args)
+    pid = spawn_link(__MODULE__, :loop, [state])
+    {:ok, pid}
+  end
+
+  def loop(state) do
+  end
+end
+
+defmodule FooServer, do: (def init(_), do: {:ok, %{}})
+# iex> {:ok, pid} = MyGenServer.start_link(FooServer, [])
+```
+
+
+## Exercise, init
+
+Make `init` into a callback behaviour  
+
+```elixir
+@callback init(args:: term) :: {:ok, state:: any} | {:stop, reason:: any}
+```
+
+
+## Solution
+
+```elixir
+defmodule MyGenServer do
+  @callback init(args:: term) :: {:ok, state:: any} | {:stop, reason:: any}
+  # ...
+end
+
+defmodule FooServer do
+  @behaviour MyGenServer
+  @impl MyGenServer
+  def init(_) do
+    {:ok, %{}}  # initialize state with empty map
+  end
+end
+```
+
+
+## Exercise, handle_call
+
+Impl. loop/receive so that message `{:call, parent_pid, request}` calls your `handle_call` callback function.
+
+```elixir
+@callback handle_call(request :: any, state :: any) :: {:ok, reply, new_state}
+```
+
+```
+{:ok, pid} = MyGenServer.start_link(FooServer, [])
+send(pid, {:call, self(), :hello}) # calls FooServer.handle_call(:hello, parent_pid, state) 
+```
+
+
+## Solution
+
+```elixir
+# MyGenServer loop:
+    receive do
+      {:call, from, request} ->
+        {:ok, _, state} = module.handle_call(request, from, state)
+        loop(module, state)
+    end
+    
+# FooServer:    
+  @impl MyGenServer
+  def handle_call(request, from, state) do
+    {:ok, :done, state}
+  end
+```
+
+
+## Exercise, API
+
+Create an API sync function `call` which receives the response from the server
+
+```
+defmodule FooServer do
+  # ...
+  def handle_call(:say_hello, state), do: {"Hello", state}
+  def handle_call(:say_goodbye, state), do: {"Bye bye", state}
+  
+# Usage:
+# {:ok, pid} = MyGenServer.start_link(FooServer, [])
+# MyGenServer.call(pid, :say_hello) # => "Hello"
+# MyGenServer.call(pid, :say_goodbye) # => "Bye bye"
+```
+
+
+## Solution
+
+```elixir
+  def call(pid, request) do
+    send(pid, {:call, self(), request})
+    receive do
+      {^pid, response} -> response
+    end
+  end
+
+  def loop(module, state) do
+    receive do
+      {:call, from, request} ->
+        {response, state} = module.handle_call(request, state)
+        send(from, {self(), response})
+        loop(module, state)
+    end
+  end
+```
+
+
 ## Register PID
 
 ```elixir
@@ -2410,6 +2555,7 @@ end
 ## Let it crash
 
 ```
+iex> MyStack.Server.start_link([42])
 iex> MyStack.pop(pid)
 42
 iex> MyStack.pop(pid)
@@ -2489,8 +2635,7 @@ Register pid with an alias
 defmodule MyStack.Server do
   use GenServer
 
-  def start_link(state) do             # Register a pid with an alias
-    d#                                           |
+  def start_link(state) do # Register a pid with an alias
     GenServer.start_link(MyStack.Server, state, name: MyStack.Server)
   end
 
