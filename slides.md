@@ -1661,7 +1661,7 @@ hej
 MFA - module, function, arguments list
 
 
-## Example
+## Silly Example
 
 ```elixir
 defmodule Greeter do
@@ -1683,7 +1683,7 @@ HelloAll.hello_to_all([NormalGreeter])
 ```
 
 
-## Excerices
+## Excercie
 
 Specify one behaviour `Parser` and one implementation of that `JSONParser` so that
   
@@ -2580,26 +2580,17 @@ What happened ?
 * Supervisor trees
 
 
-## callbacks
+## How to write a supervisor
 
-* `init/1` - returns a supervisor specification of child processes to supervise
-
-
-## worker
-
-`Supervisor.Spec.worker/3`
-
-```elixir
-children = worker(MyStack, [[]])
-```
-
-Will start Todo by calling `start_link` with one argument []
+* impl the Supervisor behaviour: (`use Supervisor`)
+* `YourModule.start_link/1` - calls [Supervisor.start_link](https://hexdocs.pm/elixir/Supervisor.html#start_link/2)
+* `YourModule.init/1` - calls [Supervisor.init](https://hexdocs.pm/elixir/Supervisor.html#init/2) - which child processes to supervise
 
 
 ## Strategies
 
 ```
-supervise(children, strategy: :one_for_one)
+Supervisor.init(children, strategy: :one_for_one)
 ```
 
 * `:one_for_one` - If a child process terminates, only that process is restarted.
@@ -2621,26 +2612,8 @@ defmodule MyStack.Supervisor do
     children = [
       worker(MyStack.Server, [["initial value"]])
     ]
-    supervise(children, strategy: :one_for_one)
+    Supervisor.init(children, strategy: :one_for_one)
   end
-end
-```
-
-
-## children
-
-Register pid with an alias
-
-```elixir
-defmodule MyStack.Server do
-  use GenServer
-
-  def start_link(state) do # Register a pid with an alias
-    GenServer.start_link(MyStack.Server, state, name: MyStack.Server)
-  end
-
-  def handle_call(:pop, _from, [h | t]), do: {:reply, h, t}
-  def handle_cast({:push, h}, t), do: {:noreply, [h | t]}
 end
 ```
 
@@ -2648,33 +2621,15 @@ end
 ## Full Example
 
 ```elixir
-defmodule MyStack.Supervisor do
-  use Supervisor
-
-  def start_link do
-    Supervisor.start_link(__MODULE__, nil)
-    # will call init with nil as argument
-  end
-
-  def init(_) do
-    children = [
-      worker(MyStack.Server, [["initial value"]])
-    ]
-    supervise(children, strategy: :one_for_one)
-  end
-end
-
 defmodule MyStack do
-  def start do
-    MyStack.Supervisor.start_link
-  end
+  @server MyStack.Server
 
   def push(data) do
-    GenServer.cast(MyStack.Server, {:push, data}) # ASync !
+    GenServer.cast(@server, {:push, data}) # ASync !
   end
 
   def pop() do
-    GenServer.call(MyStack.Server, :pop) # Sync !
+    GenServer.call(@server, :pop) # Sync !
   end
 end
 
@@ -2682,29 +2637,75 @@ defmodule MyStack.Server do
   use GenServer
 
   def start_link(state) do
-    GenServer.start_link(MyStack.Server, state, name: MyStack.Server)
+    GenServer.start_link(__MODULE__, state, name: __MODULE__)
   end
 
+  @impl true
+  def init(stack) do
+    {:ok, stack}
+  end
+
+  @impl true
   def handle_call(:pop, _from, [h | t]), do: {:reply, h, t}
+
+  @impl true
   def handle_cast({:push, h}, t), do: {:noreply, [h | t]}
+end
+
+defmodule MyStack.Supervisor do
+  use Supervisor
+
+  def start_link do
+    Supervisor.start_link(__MODULE__, nil)
+  end
+
+  def init(_) do
+    children = [
+      worker(MyStack.Server, [["initial value"]])
+    ]
+    Supervisor.init(children, strategy: :one_for_one)
+  end
 end
 ```
 
 
 ## Exercise
 
-* In IEx, compile  [my_stack_supervisor.ex](https://github.com/andreasronge/dev-happiness-elixir/blob/master/concurrency/my_stack_supervisor.ex)
 * What happens when you pop the last item on the stack ?
+* Impl. a length function on the stack
 
 
-## Multiple Children
+## Multiple Children, DynamicSupervisor
 
-* How to get PIDs ?
-(registered alias does not work)
+```elixir
+defmodule MyStack.Worker.Supervisor do
+  use DynamicSupervisor
+  @me MyStack.Worker.Supervisor
 
-* Process Registry (gproc)
-  * A supervisor for a pool of worker
+  def start_link(_) do
+    DynamicSupervisor.start_link(__MODULE__, :no_args, name: @me)
+  end
 
+  def init(:no_args) do
+    DynamicSupervisor.init(strategy: :one_for_one)
+  end
+
+  def add_worker() do
+    {:ok, _pid} = DynamicSupervisor.start_child(@me, MyStack.Worker)
+  end
+end
+```
+
+note: Use :observer.start   
+
+
+## Exercise
+
+
+* Impl MyStack.Worker that calls MyStack.pop each 2 sec
+* Use Process.send_after(self(), :work, 2000) 
+* Impl. def handle_info(:work, _)
+* Kill the worker process (found by `:observer.start`) with `Process.exit(p1, :normal)`
 
 ## Riak Supervisor Tree
 
