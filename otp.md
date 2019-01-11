@@ -631,8 +631,9 @@ What happened ?
 Supervisor.init(children, strategy: :one_for_one)
 ```
 
-* `:one_for_one` - If a child process terminates, only that process is restarted.
-* `:one_for_all`, `:rest_for_one`, `:simple_one_for_one`
+* `:one_for_one` - only that process is restarted.
+* `:one_for_all` -  all child processes are restarted
+* `:rest_for_one` - the rest of the children restarted
 
 
 ## Example
@@ -642,13 +643,12 @@ defmodule MyStack.Supervisor do
   use Supervisor
 
   def start_link do
-    Supervisor.start_link(__MODULE__, nil)
-    # will call init with nil as argument
+    Supervisor.start_link(__MODULE__, :no_arg)
   end
 
-  def init(_) do
+  def init(:no_arg) do
     children = [
-      worker(MyStack.Server, [["initial value"]])
+      MyStack.Server
     ]
     Supervisor.init(children, strategy: :one_for_one)
   end
@@ -696,12 +696,12 @@ defmodule MyStack.Supervisor do
   use Supervisor
 
   def start_link do
-    Supervisor.start_link(__MODULE__, nil)
+    Supervisor.start_link(__MODULE__, :no_arg)
   end
 
-  def init(_) do
+  def init(:no_arg) do
     children = [
-      worker(MyStack.Server, [["initial value"]])
+      MyStack.Server
     ]
     Supervisor.init(children, strategy: :one_for_one)
   end
@@ -715,23 +715,40 @@ end
 * Impl. a length function on the stack
 
 
-## Multiple Children, DynamicSupervisor
+## Child Specs
+
+how supervisor should start, stop and restart 
+
+```
+iex(1)> MyStack.Server.child_spec(:hej)
+%{id: MyStack.Server, start: {MyStack.Server, :start_link, [:hej]}}
+# also check: iex> h Supervisor  and h 
+```
+
+
+## Debugging GenServers
+
+See :sys module 
+
+
+## DynamicSupervisor
 
 ```elixir
-defmodule MyStack.Worker.Supervisor do
+defmodule MyApp.DynamicSupervisor do
+  # Automatically defines child_spec/1
   use DynamicSupervisor
-  @me MyStack.Worker.Supervisor
 
-  def start_link(_) do
-    DynamicSupervisor.start_link(__MODULE__, :no_args, name: @me)
+  def start_link(arg) do
+    DynamicSupervisor.start_link(__MODULE__, arg, name: __MODULE__)
   end
 
-  def init(:no_args) do
+  @impl true
+  def init(_arg) do
     DynamicSupervisor.init(strategy: :one_for_one)
   end
 
-  def add_worker() do
-    {:ok, _pid} = DynamicSupervisor.start_child(@me, MyStack.Worker)
+  def start_worker do
+     DynamicSupervisor.start_child(__MODULE__, SomeWorker)
   end
 end
 ```
@@ -748,11 +765,12 @@ note: Use :observer.start
 * Kill the worker process (found by `:observer.start`) with `Process.exit(p1, :normal)`
 ```
 
-Solution: [exercises/otp/job](exercises/otp/jo)
+Solution: [exercises/otp/job](exercises/otp/job)
 
 
 ## Links
 
+* https://github.com/pragdave/component
 * https://ferd.ca/the-hitchhiker-s-guide-to-the-unexpected.html
 
 [<img src="img/supervision-tree.png">](img/supervision-tree.png)

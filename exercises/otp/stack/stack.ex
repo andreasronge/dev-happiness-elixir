@@ -35,10 +35,10 @@ defmodule MyStack.Supervisor do
   use Supervisor
 
   def start_link do
-    Supervisor.start_link(__MODULE__, nil)
+    Supervisor.start_link(__MODULE__, :no_arg)
   end
 
-  def init(_) do
+  def init(:no_arg) do
     children = [
       MyStack.Server
     ]
