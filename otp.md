@@ -1,4 +1,4 @@
-my# OTP
+# OTP
 
 Concurrency and the Erlang Runtime
 
@@ -12,17 +12,6 @@ Concurrency and the Erlang Runtime
 * takes advantage of a multi-core or multi-CPU computer
 * each process has a private heap that is garbage collected independently
 * preemptive scheduling
-
-
-## I/O Calls
-
-* the calling process is preempted
-* A separate async threads
-
-
-(source [Erlang Factory](http://www.erlang-factory.com/upload/presentations/105/KennethLundin-ErlangFactory2009London-AboutErlangOTPandMulti-coreperformanceinparticular.pdf))
-
-[<img src="img/erlang-smp.png">](img/erlang-smp.png)
 
 
 ## Creating a new process
@@ -133,6 +122,36 @@ end
 ```
 
 
+## I/O Calls
+
+* IO device is a PID to an IO process
+
+```
+e = Process.whereis(:standard_error)
+IO.puts(e, "hej")
+```
+
+
+## Example, IO
+
+```elixir
+defmodule MYIODevice do
+  def listen() do
+    receive do
+      {:io_request, from, reply_as, {:put_chars, :unicode, message}} ->
+        send(from, {:io_reply, reply_as, :ok})
+        IO.puts(message)
+        IO.puts("I see you")
+        listen()
+    end
+  end
+end
+pid = spawn_link(MYIODevice, :listen, [])
+IO.puts(pid, "Hey there")
+# See https://til.hashrocket.com/posts/ahjvkb6zqv-comply-with-the-erlang-io-protocol
+```
+
+
 ## When to use Processes
 
 * Mutable state and access to shared resources (such as ETS, files, etc.)
@@ -227,18 +246,44 @@ iex> flush
 ## Exercise, trapping
 
 ```elixir
-receive do
-	:hi -> loop()
-	:bye -> IO.puts "Bye"
-	:boom -> throw "Boom"
-end
+defmodule ExitDemo do
+  def loop() do
+    receive do
+      :hi -> loop()
+      :bye -> IO.puts "Bye"
+      :boom -> throw "Boom"
+    end
 
 # What exit reason when sending ?
 # * `:bye`
 # * `:boom`
+# * `:hello`
 # * `:hi`
 # * Process.exit(pid, :bla)
 # * Process.exit(pid, :kill)
+```
+
+
+## Answer, bye
+
+```
+iex> Process.flag(:trap_exit, true)  
+iex> pid = spawn_link(ExitDemo, :loop, [])
+iex> send(pid, :bye)                      
+iex> flush
+{:EXIT, #PID<0.118.0>, :normal}
+```
+
+
+## Answer, boom
+
+```
+iex> Process.flag(:trap_exit, true)  
+iex> pid = spawn_link(ExitDemo, :loop, [])
+iex> send(pid, :boom)                      
+iex> flush
+{:EXIT, #PID<0.122.0>,
+ {{:nocatch, "Boom"}, [{ExitDemo, :loop, 0, [file: 'exit.ex', line: 6]}]}}
 ```
 
 

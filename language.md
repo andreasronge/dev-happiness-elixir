@@ -72,18 +72,14 @@ Design for:
 * Actor Model (independent discovery)
 * OTP, e.g. supervisor behaviour
 * Erlang VM
+* +20 years of experience of distributed computing
 
 
 ## Who uses it
-Examples
-
-* Companies:
-
-	Amazon, Yahoo, WhatsApp, Ericsson
 
 * Type of products:
 
-	Game Servers, Distributed DB, message brokers
+	Game Servers, Distributed DB, message brokers, embedded (nerves), trading platforms
 
 * Open source
 
@@ -92,9 +88,33 @@ Examples
 
 ## Who cares ?
 
-Do you need it ?
 * Support 2,277,845 simultaneous TCP connections on one machine
+* How do you support 450 million users with only 32 engineers ?
 * Downtime of 1 sec per 20 year
+* Unique runtime -> rethink how we design software, e.g. stateful servers
+* Transparent message passing (remote and local)
+
+
+## Example
+
+```elixir 
+  # see https://moboudra.com/whistle-interactive-web-apps-with-elixir/
+  def update({:increment, n}, state, session) do
+    {:ok, state + n, session}
+  end
+
+  def update({:decrement, n}, state, session) do
+    {:ok, state - n, session}
+  end
+
+  def view(state, _session) do
+    Html.div([], [
+      Html.button([on: [click: {:increment, 1}]], "+"),
+      Html.text(to_string(state)),
+      Html.button([on: [click: {:decrement, 1}]], "-")
+    ])
+  end
+```
 
 
 ## Why Elixir
@@ -108,39 +128,10 @@ Do you need it ?
 * Fun and productive language !
 
 
-## Future ?
+## Some Resources
 
-* Parameters:
-  * Future of functional programming ?
-  * Future of the JVM ?
-  * What type of applications needs to be build ?
-	  * e.g. realtime, concurrent connections ?
-  * Evangelists ?
-  * [Learning resources](https://github.com/elixir-lang/elixir/wiki)
-  * Success stories
-
-
-## Elixir Popularity
-
-* Job market/ecosystem is growing
-  * [jobs/alchemists](http://plataformatec.com.br/elixir-radar/jobs)
-  * [Elixir companies](https://github.com/doomspork/elixir-companies)
-  * [Elixir libraries/tools](https://github.com/h4cc/awesome-elixir) and [hex.pm](https://hex.pm/)
-
-
-## Fun driven development
-
-"Change is the only constant"
-
-Let's try new things and have fun
-
-
-## Resources
-
-* Books
-  * [Programming Elixir](https://pragprog.com/book/elixir/programming-elixir)
-  * [Elixir in Action](https://www.manning.com/books/elixir-in-action)
-* [elixir-lang.org](http://elixir-lang.org/)  
+* [Elixir School](https://elixirschool.com/en/)
+* [Elixir Lang, getting started](https://elixir-lang.org/getting-started/introduction.html)
 * [exercism.io](http://exercism.io/)
 * IEX and elixir docs
 
@@ -148,7 +139,7 @@ Let's try new things and have fun
 ## Installation
 
 * `brew install elixir`
-
+* https://elixir-lang.org/install.html
 
 ## IEX
 
@@ -191,8 +182,15 @@ iex> r HelloWorld
 
 ## True and False
 
-* Truth: `true`, `false`, `nil`
+Everything is truthy except for `false` and `nil`
 
+```
+iex> !nil || !!"hej"
+true
+```
+
+
+## Equal
 
 * strict: `===`
 
@@ -201,6 +199,8 @@ iex> r HelloWorld
 * value equality: `==`
 
   `1 == 1.0 is true`
+
+The only difference between == and === is that === is strict when it comes to comparing integers and floats
 
 
 ## And/Or
@@ -497,7 +497,7 @@ iex> [a: 1, b: 2]
 
 * Can be used with `Enum` and `Keyword`
 * Keys are ordered
-* Keys can be given more then once
+* Keys can be given more than once
 * Square bracket optional in last arg
 
 
@@ -690,6 +690,7 @@ iex(36)> %Person{me | name: "you"}
 
 ```
 
+
 ## Required Keys
 
 ```
@@ -817,7 +818,6 @@ end
 
 ## import
 
-* Not needed
 * Allows using without fully-qualified name.
 
 ```
@@ -908,6 +908,17 @@ iex(33)> sum.(1,2)
 ```
 
 
+## Curry ?
+
+```
+iex> multi = fn(x,y) -> x * y end  # or &(&1 * &2)
+#Function<12.128620087/2 in :erl_eval.expr/5>
+iex> times2 = &(multi.(2, &1))
+#Function<6.128620087/1 in :erl_eval.expr/5>
+iex> times2.(42)
+```
+
+
 ## Function returning function
 
 ```
@@ -971,14 +982,13 @@ iex> 1 = 1
 1
 iex> 1 = 0
 ** (MatchError) no match of right hand side value: 0
-
+iex> x = 3
 iex> 3 = x
 3
 iex> 4 = x
 ** (MatchError) no match of right hand side value: 3
 iex> x = 4
 4
-
 iex> ^x = 4
 4
 iex> ^x = 5
@@ -1120,7 +1130,6 @@ iex> with {:ok, width} <- Map.fetch(opts, :width),
 [Kernel.SpecialForms.html#with/1](https://hexdocs.pm/elixir/Kernel.SpecialForms.html#with/1)
 
 
-
 ## Function argument
 
 ```elixir
@@ -1254,6 +1263,7 @@ Solution: `{_, a} = {:foo, :bar}`
 iex> f = fn({_, price}) -> price end
 iex> f.({"vanilla", 3})             
 3
+# or elem({"vanilla", 3}, 1)
 ```
 
 
@@ -1296,6 +1306,7 @@ Use `Enum` functions
 
 ```
 icecreams = [{"cookies", 5}, {"chocolate", 3}, {"mint", 4}]
+# e.g. icecream |> ...
 ```
 
 
@@ -1303,6 +1314,8 @@ icecreams = [{"cookies", 5}, {"chocolate", 3}, {"mint", 4}]
 
 ```elixir
 icecreams |> Enum.map(fn({_, price}) -> price end) |> Enum.sum
+# or
+icecreams |> Enum.map(&elem(&1, 1)) |> Enum.sum
 ```
 
 
@@ -1358,7 +1371,7 @@ Guard.what_is([1,2,3]) # => [1,2,3] is a list
 
 ```elixir
 "hej" <> hopp  = "hejhopp"
-[h| t] = to_char_list("abcd")
+[h| t] = to_charlist("abcd")
 
  <<0, 1, x>> = <<0, 1, 2>> # match 3 bytes
  <<0, 1, x :: binary>> = <<0, 1, 2, 3>>  #
@@ -1686,21 +1699,26 @@ HelloAll.hello_to_all([NormalGreeter])
 
 ## Excercie
 
-Specify one behaviour `Parser` and one implementation of that `JSONParser` so that
+Implement `Parser` so that:
+```elixir
+JSONParser.parse("foo") -> {:ok, "foo"}
+Parser.parse!(JSONParser, "foo") -> "foo"
+Parser.parse!(JSONParser, "bar") # raise Argument exception (iex> h raise)
 
+defmodule JSONParser do
+  @behaviour Parser
+  def parse("foo"), do: {:ok, "foo"}
+  def parse(_), do: {:error, "oh no"}
+end
+# https://elixir-lang.org/getting-started/typespecs-and-behaviours.html
 ```
-JSONParser.parse("foo") -> {:ok, "foobar"}  # use hard coded values
-Parser.parse!(JSONParser, "foo") -> "foobar"  # use hard coded values
-```
-
-What happens if JSONParser does not return correct tuple type ?
 
 
-## Answer
+## Solution
 
 ```elixir
 defmodule Parser do
-  @callback parse(String.t) :: {:ok, term} | {:error, String.t}
+  @callback parse(String.t) :: {:ok, String.t} | {:error, String.t}
 
   def parse!(implementation, contents) do
     case implementation.parse(contents) do
@@ -1711,9 +1729,6 @@ defmodule Parser do
 end
 ```
 
-https://elixir-lang.org/getting-started/typespecs-and-behaviours.html
-
-note: term - any type
 
 
 # Protocols

@@ -40,7 +40,7 @@ defmodule MyStack.Supervisor do
 
   def init(_) do
     children = [
-      worker(MyStack.Server, [["initial value"]])
+      MyStack.Server
     ]
 
     Supervisor.init(children, strategy: :one_for_one)
