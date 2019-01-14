@@ -2,6 +2,16 @@
 
 Concurrency and the Erlang Runtime
 
+[Back](/index.html)
+
+
+# Content
+
+* Processes
+* OTP GenServer, built your own
+* OTP Supervisors
+* Distributed Elixir
+* OTP Applications
 
 
 # Processes
@@ -12,6 +22,30 @@ Concurrency and the Erlang Runtime
 * takes advantage of a multi-core or multi-CPU computer
 * each process has a private heap that is garbage collected independently
 * preemptive scheduling
+
+
+## Soft and Hard Realtime
+
+* Soft real-time
+  * Some requests might miss the deadlines.
+* Hard real-time
+  * you must absolutely hit every deadline.
+
+
+## Preemtive scheduling
+
+* Erlang does preemptive multitasking and gets soft-realtime right. 
+* Values low latency over raw throughput (unusual)
+* Preemption means that the scheduler can force a task off execution.
+
+See [here](http://jlouisramblings.blogspot.com/2013/01/how-erlang-does-scheduling.html)
+
+
+## Runtime
+
+(source [Erlang Factory](http://www.erlang-factory.com/upload/presentations/105/KennethLundin-ErlangFactory2009London-AboutErlangOTPandMulti-coreperformanceinparticular.pdf))
+
+[<img src="img/erlang-smp.png">](img/erlang-smp.png)
 
 
 ## Creating a new process
@@ -124,7 +158,9 @@ end
 
 ## I/O Calls
 
-* IO device is a PID to an IO process
+* IO device is a process.
+* Allows read/write files between remote nodes
+* Process group leader for IO processes acts as a proxies for sending back reply from remote nodes.
 
 ```
 e = Process.whereis(:standard_error)
@@ -780,12 +816,19 @@ Solution: [exercises/otp/job](exercises/otp/job)
 # Distributed Elixir
 
 
-## Nodes
+## Node
 
-Connecting nodes to clusters
+An executing Erlang runtime system which has been given a name.
+Connections are by default transitive.
+Nodes are protected by a magic cookie system.
+
+
+## Connected Nodes
 
 ```
+# Give node a name
 iex --sname foo@localhost
+# Connecting this node to other node
 iex(foo@localhost)> Node.connect :bar@localhost
 true
 iex(foo@localhost)> Node.list
@@ -819,6 +862,8 @@ iex --name one@192.168.0.42 --cookie secret
 
 ## Spawn
 
+Creates a remote process on a node:
+
 ```
 iex(foo@localhost)> Node.list
 [:bar@localhost]
@@ -830,8 +875,6 @@ iex(foo@localhost)> Node.spawn(:bar@localhost,
 iex(foo@localhost)> flush
 {:response, "Hi"}
 ```
-
-Use MFA (module, function argument list) instead of lambdas
 
 
 ## Ping Pong
@@ -890,6 +933,15 @@ GenServer.start_link, name: {:global, :some_alias}
 * Has a standard folder structure, config and lifecycle (`loaded`, `started`, `stopped`)
 
 
+## App file
+
+* Example:
+`_build/dev/lib/mystack/ebin/mystack.app`
+
+* Created by mix build tool
+* See also `mix help compile.app`
+
+
 ## Generate with mix
 
 `mix new mystack --sup`
@@ -916,6 +968,8 @@ end
 
 
 ## Library Applications
+
+Only needed to be listed as a deps in the mix file
 
 
 ## Mix File
@@ -1013,3 +1067,8 @@ or just
 iex --erl "myplug port 5454" -S mix
 # see also Application.get_env/2
 ```
+
+
+##
+
+[Back](/index.html)

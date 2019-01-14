@@ -1,142 +1,22 @@
-### The Elixir language
+# The Elixir Language
 
-Study notes
-
-Andreas Ronge (@ronge)
+[Back](/index.html)
 
 
-# Contents
+# Content
 
-* Introduction
-* Language
-* Concurrency
-* Distributed Elixir
-* Tools
-
-
-## The language
-
-* Operators
-* Datatypes
-* Functions/Modules
-* Pattern Matching
-* Comprehension
-* Control Flow
-* Documentation
-* Typespecs
-* Behaviours
-* Protocols
-* Macros
-
-
-## Concurrency
-
-* Processes, Linking/Trapping
-* OTP Server
-* OTP Supervisor
-
-
-## Distributed Elixir
-
-* nodes
-* discovery
-* multicast, clusters/groups
-
-
-## Tools
-
-* mix, hex
-* exunit, plug
-* hot deployment, distillery
-* OTP Application
+* Installation and Irb
+* Language:
+  * Operators, Datatypes
+  * Functions/Modules, Pattern Matching
+  * Comprehension, Control Flow
+  * Typespecs, Behaviours
+  * Protocols, Macros
 
 
 
-# Introduction
 
-
-## Why Erlang
-
-Design for:
-* Fault-tolerant
-* High availability
-* Hot code replacement
-* Self healing network
-* Distributed
-* Soft real-time
-
-
-## How
-
-* Functional Programming
-* Actor Model (independent discovery)
-* OTP, e.g. supervisor behaviour
-* Erlang VM
-* +20 years of experience of distributed computing
-
-
-## Who uses it
-
-* Type of products:
-
-	Game Servers, Distributed DB, message brokers, embedded (nerves), trading platforms
-
-* Open source
-
-	CouchDB, Riak, RabbitMQ, ejabberd,
-
-
-## Who cares ?
-
-* Support 2,277,845 simultaneous TCP connections on one machine
-* How do you support 450 million users with only 32 engineers ?
-* Downtime of 1 sec per 20 year
-* Unique runtime -> rethink how we design software, e.g. stateful servers
-* Transparent message passing (remote and local)
-
-
-## Example
-
-```elixir 
-  # see https://moboudra.com/whistle-interactive-web-apps-with-elixir/
-  def update({:increment, n}, state, session) do
-    {:ok, state + n, session}
-  end
-
-  def update({:decrement, n}, state, session) do
-    {:ok, state - n, session}
-  end
-
-  def view(state, _session) do
-    Html.div([], [
-      Html.button([on: [click: {:increment, 1}]], "+"),
-      Html.text(to_string(state)),
-      Html.button([on: [click: {:decrement, 1}]], "-")
-    ])
-  end
-```
-
-
-## Why Elixir
-
-* Extensible design (macros, protocols)
-* Great elixir ecosystem and tooling
-* Phoenix Web Framework
-* Easy to learn/use FP language
-* Syntax matters
-* Built on Erlang Runtime
-* Fun and productive language !
-
-
-## Some Resources
-
-* [Elixir School](https://elixirschool.com/en/)
-* [Elixir Lang, getting started](https://elixir-lang.org/getting-started/introduction.html)
-* [exercism.io](http://exercism.io/)
-* IEX and elixir docs
-
-
-## Installation
+# Installation
 
 * `brew install elixir`
 * https://elixir-lang.org/install.html
@@ -192,15 +72,12 @@ true
 
 ## Equal
 
-* strict: `===`
-
-  `1 === 1.0 is false`
-
 * value equality: `==`
+  * `1 == 1.0` is true (use === for strict)
+  * `5 == "5"` is false
+  * `"" == false` is false
 
-  `1 == 1.0 is true`
-
-The only difference between == and === is that === is strict when it comes to comparing integers and floats
+(The only difference between == and === is that === is strict when it comes to comparing integers and floats)
 
 
 ## And/Or
