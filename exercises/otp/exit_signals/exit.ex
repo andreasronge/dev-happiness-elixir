@@ -8,4 +8,4 @@ defmodule ExitDemo do
   end
 end
 
-# pid = spawn_link(ExitDemo, :listen, [])
+# pid = spawn_link(ExitDemo, :loop, [])

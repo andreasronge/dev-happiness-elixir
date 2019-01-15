@@ -7,21 +7,23 @@ Concurrency and the Erlang Runtime
 
 # Content
 
-* Processes
-* OTP GenServer, built your own
+* Beam runtime & Processes
+* OTP GenServer
 * OTP Supervisors
 * Distributed Elixir
 * OTP Applications
+* OTP Distribution/Distillery
 
 
-# Processes
 
-* all code runs inside processes
-* actor model: message passing, share nothing
-* extremely lightweight
-* takes advantage of a multi-core or multi-CPU computer
-* each process has a private heap that is garbage collected independently
-* preemptive scheduling
+# The Runtime
+
+* Executes BEAM code. 
+* Actor Model based concurrence
+  * Message passing - share nothing
+  * all code runs inside processes
+  * extremely lightweight, 2KB per process (Java >1MB thread)
+  * impossible to block a thread (unlike Java)
 
 
 ## Soft and Hard Realtime
@@ -30,6 +32,11 @@ Concurrency and the Erlang Runtime
   * Some requests might miss the deadlines.
 * Hard real-time
   * you must absolutely hit every deadline.
+
+
+## Garbage collection
+
+* each process has a private heap that is garbage collected independently
 
 
 ## Preemtive scheduling
@@ -41,8 +48,9 @@ Concurrency and the Erlang Runtime
 See [here](http://jlouisramblings.blogspot.com/2013/01/how-erlang-does-scheduling.html)
 
 
-## Runtime
+## Sceduling
 
+Scedulers has run queues with runnable processes
 (source [Erlang Factory](http://www.erlang-factory.com/upload/presentations/105/KennethLundin-ErlangFactory2009London-AboutErlangOTPandMulti-coreperformanceinparticular.pdf))
 
 [<img src="img/erlang-smp.png">](img/erlang-smp.png)
@@ -930,46 +938,40 @@ GenServer.start_link, name: {:global, :some_alias}
 # OTP Application
 
 * Used to package Erlang/OTP software
-* Has a standard folder structure, config and lifecycle (`loaded`, `started`, `stopped`)
+* Has a standard folder structure and config
+* Lifecycle (`loaded`, `started`, `stopped`)
+* OTP Behaviour
+* Built by mix
 
 
-## App file
+## Why OTP Apps ?
+
+* Reusable components
+* Configure without recompile
+* Runtime dependencies
+* Automatic start
+
+
+## OTP folder structure
 
 * Example:
 `_build/dev/lib/mystack/ebin/mystack.app`
 
-* Created by mix build tool
 * See also `mix help compile.app`
 
 
-## Generate with mix
-
-`mix new mystack --sup`
-
-See [exercises/otp/mystack](exercises/otp/mystack)
-
-
-## lib/app_name/application.ex
+## OTP Behaviour
 
 ```elixir
+# Example
 defmodule Mystack.Application do 
   use Application
 
   def start(_type, _args) do
-    children = [
-      # Starts a worker by calling: Mystack.Worker.start_link(arg)
-      # {Mystack.Worker, arg},
-    ]
-    opts = [strategy: :one_for_one, name: Mystack.Supervisor]
-    Supervisor.start_link(children, opts)
+    MyStack.Supervisor.start_link
   end
 end
 ```
-
-
-## Library Applications
-
-Only needed to be listed as a deps in the mix file
 
 
 ## Mix File
@@ -978,19 +980,33 @@ Only needed to be listed as a deps in the mix file
 defmodule MyPlug.Mixfile do
   use Mix.Project
 
-  def project do  # Description of the project
-    [ app: :my_plug, version: "0.2.1", elixir: "~> 1.3", ...
-     deps: deps()]
+  def project do  
+    # Description of the project ...
   end
 
   # Configuration for the OTP application
   def application do
-    [ applications: [:logger, :cowboy, :plug], # Runtime deps  
-      mod: {MyPlug, []} # The Application OTP Behaviour
+    [
+      mod: {MyPlug.Application, []}  # <- Here
     ]
   end
 
-  def deps: ...  # compile time deps
+  defp deps do ...
+```
+
+
+## Extra Applications
+
+* Applications starts automatically if listed in the deps function.
+* If you want to start an optional application (like logger):
+
+```
+  def application do
+    [
+      extra_applications: [:logger], # <- Add this
+      mod: {MyPlug.Application, []}
+    ]
+  end
 ```
 
 
@@ -1031,25 +1047,11 @@ my_plug
 ```
 
 
-## OTP Application
+## Starting/Stopping
 
-```elixir
-defmodule MyApp do
-  use Application
-
-  def start(_type, _args) do
-    MyApp.Supervisor.start_link()
-  end
-end
 ```
-
-
-## Why
-
-* Reusable components
-* Configure without recompile
-* Runtime dependencies
-* Automatic start
+Application.start(:app_stack)
+```
 
 
 ## Application Configuration
@@ -1069,6 +1071,59 @@ iex --erl "myplug port 5454" -S mix
 ```
 
 
-##
+## Runtime Config
+
+```
+Application.stop(:app_stack)
+Application.put_env(:app_stack, :port, 1234)
+Application.start(:app_stack)
+```
+
+
+
+## OTP Release
+
+* Complete system: erlang runtime, otp applications, boot script
+* Compiled for a target system
+* Can perform hot upgrades and downgrades
+* Can be remotely administered
+
+[See also](http://erlang.org/doc/design_principles/release_structure.htm)
+
+
+## Distillery
+
+```
+# mix.exs:
+  defp deps do
+    [
+      {:distillery, "~> 2.0"}
+```
+
+```
+ mix deps.get deps.compile
+ mix release.init
+ mix release
+```
+
+
+## Result
+
+```
+Release successfully built!
+To start the release you have built, you can use one of the following tasks:
+
+  # start a shell, like 'iex -S mix'
+  > _build/dev/rel/app_stack/bin/app_stack console
+  # start in the foreground, like 'mix run --no-halt'
+  > _build/dev/rel/app_stack/bin/app_stack foreground
+  # ....
+```
+
+
+## Resources
+
+* [The Hitchhiker's Guide to Concurrency](https://learnyousomeerlang.com/the-hitchhikers-guide-to-concurrency)
+* [Erlang in Anger](https://www.erlang-in-anger.com/)
 
 [Back](/index.html)

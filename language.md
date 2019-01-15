@@ -53,6 +53,12 @@ iex> r HelloWorld
 * `.exs` intepreted
 
 
+## VSCODE
+
+* vscode-elixir
+* ElixirLS
+* vscode-elixir-formatter
+
 
 # The Language
 

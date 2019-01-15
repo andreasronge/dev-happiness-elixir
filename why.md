@@ -53,7 +53,7 @@ Ericsson Radio Systems banned the in-house use of Erlang for new products, citin
 ## Who uses it
 
 *	Game Servers, IoT (nerves), trading platforms, blockchain
-*	CouchDB, Riak, RabbitMQ, ejabberd, connection pooling
+*	CouchDB, Riak, RabbitMQ, ejabberd, web servers, connection pooling
 
 
 ## Who cares ?
