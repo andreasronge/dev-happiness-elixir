@@ -1,8 +1,4 @@
 defmodule AppStack do
-  def start_link do
-    App.visor().start_link()
-  end
-
   def add_worker do
     AppStack.Worker.Supervisor.add_worker()
   end
@@ -15,17 +11,28 @@ end
 defmodule AppStack.Supervisor do
   use Supervisor
 
-  def start_link do
-    Supervisor.start_link(__MODULE__, nil)
+  def start_link(opts) do
+    Supervisor.start_link(__MODULE__, :ok, opts)
   end
 
-  def init(_) do
+  def init(:ok) do
     children = [
-      {AppStack.Registry, [[]]},
+      AppStack.Registry,
       AppStack.Worker.Supervisor
     ]
 
     Supervisor.init(children, strategy: :one_for_one)
+  end
+end
+
+defmodule AppStack.Application do
+  use Application
+
+  def start(type, args) do
+    IO.puts("Start app type: #{inspect(type)}, args: #{inspect(args)}")
+    default_jobs = Application.get_env(:app_stack, :default_jobs)
+    IO.puts("default_jobs #{inspect(default_jobs)}")
+    AppStack.Supervisor.start_link(name: AppStack.Supervisor)
   end
 end
 

@@ -1,4 +1,5 @@
 node_modules/
+.elixir_ls/
 deps/
 _build/
 *.beam
