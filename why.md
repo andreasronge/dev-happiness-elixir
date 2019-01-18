@@ -1,5 +1,7 @@
 # Why Elixir ?
 
+More than a language
+
 [Back](/index.html)
 
 
@@ -69,14 +71,17 @@ Ericsson Radio Systems banned the in-house use of Erlang for new products, citin
 But I don't have 2,277,845 TCP connections or need distributed computing
 
 
-## OTP/Beam is very useful
+## Why you should care
 
-* Great peformance is always welcome
-* Tools/Libraries uses it, e.g ExUnit
-  * run concurrent tests, 
-  * make sure they run in isolation etc.
-* OTP ecosystem - how to distribute/config/assemble/reuse software
-* Simplicity, everything runs in a process with message passing
+* Peformance, e.g.
+  * better performance => simpler design
+* Concurrency/Scalability/fault tolerance
+  * Used everywhere: e.g. run concurrent isolated tests
+  * actor model
+* OTP design and ecosystem
+  * how to distribute/config/assemble/reuse software
+
+Simplicity
 
 
 ## What is Elixir ?
@@ -85,6 +90,8 @@ But I don't have 2,277,845 TCP connections or need distributed computing
 * Created 2011 by Jose Valim
 * Compiles to bytecode for BEAM
 
+
+Tried to solve 
 
 ## Why Elixir, 1
 
@@ -196,15 +203,24 @@ For maps, the function expects a key-value tuple.
 [<img src="img/vscode.png">](img/vscode.png)
 
 
+## Less is More
+
+Great technology is not what it adds but what it removes.
+
+
+[<img src="img/elixir-in-action.png">](img/vscode.png)
+([Elixir In Action](https://www.manning.com/books/elixir-in-action))
+
+
 ## Why not node ?
 
 * JavasScript Fatigue
 * Everyone think they can write JS code
   * mastering JS requires a significant amount of effort
 * Immaturity of tooling/poor quality
-* Single thread 
-  * performance problems
-  * if process crashes for one user, it crashes for all the requests being handled 
+* Single thread/event loop
+  * if process crashes/blocked ...
+* Imaging running a database inside your node application ...
 
 
 ## Some Resources
@@ -215,6 +231,7 @@ For maps, the function expects a key-value tuple.
 * [exercism.io](http://exercism.io/)
 * [Would you still pick Elixir in 2019?](https://github.com/dwyl/learn-elixir/issues/102?utm_source=elixirdigest&utm_medium=email&utm_campaign=featured)
 * IEX and elixir docs
+* [Why I'm betting on elixir](https://rossta.net/blog/why-i-am-betting-on-elixir.html)
 
 [Back](/index.html)
 
