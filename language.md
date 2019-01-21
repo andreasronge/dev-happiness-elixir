@@ -60,10 +60,23 @@ iex> r HelloWorld
 * vscode-elixir-formatter
 
 
+
 # The Language
 
 
-## Operators
+## The Fundamental
+
+* Modules
+* Functions
+* Data Structures
+
+
+## Kernel Module
+
+```
+Kernel.+(1,2)
+# same as 1 + 2
+```
 
 
 ## True and False
@@ -248,7 +261,6 @@ IO.puts "Hello #{String.capitalize name}"
 ## string
 
 ```text
-iex> i "123"
 Term
   "123"
 Data type
@@ -256,13 +268,14 @@ Data type
 Byte size
   3
 Description
-  This is a string: a UTF-8 encoded binary.
-  It's printed surrounded by "double quotes" because all UTF-8
-  encoded codepoints in it are printable.
+  This is a string: a UTF-8 encoded binary. It's printed surrounded by
+  "double quotes" because all UTF-8 encoded codepoints in it are printable.
 Raw representation
   <<49, 50, 51>>
 Reference modules
   String, :binary
+Implemented protocols
+  Collectable, IEx.Info, Inspect, List.Chars, String.Chars
 ```
 
 
@@ -1306,6 +1319,7 @@ case {1, 2, 3} do
 end
 ```
 
+
 ## case, example 2
 
 ```elixir
@@ -1314,6 +1328,18 @@ case :gen_tcp.connect 'localhost', 8001, [] do
   {:error, reason} -> handle_error(reason)
 end
 ```
+
+
+## case, assignment
+
+```elixir
+ atom =
+      case integer do
+        1 -> :one
+        2 -> :two
+      end
+```
+[elixir-with-syntax-and-guard-clauses/](https://blog.sundaycoding.com/blog/2017/12/27/elixir-with-syntax-and-guard-clauses/)
 
 
 ## cond
@@ -1354,11 +1380,40 @@ if true, do: 2, else: 4
 ```
 
 
+## With
+
+```elixir
+# from https://blog.sundaycoding.com/blog/2017/12/27/elixir-with-syntax-and-guard-clauses/
+def call(conn, _options) do
+  with user_id when not is_nil(user_id) <- get_session(conn, :user_id),
+       user when not is_nil(user) <- Repo.get(User, user_id)
+  do
+    assign(conn, :current_user, user)
+  else
+    _ ->
+      conn
+      |> Controller.put_flash(:error, "You have to sign in to access this page.")
+      |> Controller.redirect(to: "/sign_in_links/new")
+      |> halt
+  end
+end
+```
+
 
 # Stream module
 
 Similar to Enum but supports lazy operations.
 
+
+## Random example
+
+```
+# see https://hexdocs.pm/elixir/Stream.html
+File.stream!("/path/to/file")
+|> Stream.map(&String.replace(&1, "#", "%"))
+|> Stream.into(File.stream!("/path/to/other/file"))
+|> Stream.run()
+```
 
 
 # Typespecs

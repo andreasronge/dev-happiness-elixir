@@ -73,7 +73,7 @@ But I don't have 2,277,845 TCP connections or need distributed computing
 
 ## Why you should care
 
-* Peformance, e.g.
+* Performance, e.g.
   * better performance => simpler design
 * Concurrency/Scalability/fault tolerance
   * Used everywhere: e.g. run concurrent isolated tests
@@ -90,8 +90,6 @@ Simplicity
 * Created 2011 by Jose Valim
 * Compiles to bytecode for BEAM
 
-
-Tried to solve 
 
 ## Why Elixir, 1
 
@@ -110,7 +108,7 @@ Tried to solve
 
 * Stable language
 * Extensible design (macros, protocols)
-* Easy to learn/use FP language
+* Easy to learn - explicit, no magic
 * First class documentation
 * Syntax matters => maintainable code
 * Excellent testing support
