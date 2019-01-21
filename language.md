@@ -578,12 +578,15 @@ iex> p.qwe
 ## Updating Structs
 
 ```
-iex> me = Map.put(%{Person}, :name, "Andreas")
-%Person{age: 0, name: "Andreas"}
+# Avoid
+iex> me = Map.put(%Person{}, :name, "Andreas")
 
+# Better
+iex> me = struct(Person, name: "Andreas")
+
+# Or
 iex(36)> %Person{me | name: "you"}
 %Person{age: 0, name: "you"}
-
 ```
 
 
