@@ -201,10 +201,14 @@ For maps, the function expects a key-value tuple.
 [<img src="img/vscode.png">](img/vscode.png)
 
 
+## Complile Time Macros
+
+[<img src="img/compile_errors_html.png">](img/compile_errors_html.png)
+
+
 ## Less is More
 
-Great technology is not what it adds but what it removes.
-
+Removing third party dependencies:
 
 [<img src="img/elixir-in-action.png">](img/vscode.png)
 ([Elixir In Action](https://www.manning.com/books/elixir-in-action))

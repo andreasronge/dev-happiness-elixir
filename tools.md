@@ -1,5 +1,12 @@
 # Elixir Tools
 
+TODO
+
+[Back](/index.html)
+
+
+## Content
+
 * Debugging
 * Mix/Hex
 * Mix format
@@ -32,17 +39,10 @@ cd my_plug
 
 Edit `mix.exs`
 
-Add:
-
 ```
-def application do
-  [applications: [:cowboy, :plug]]
-end
-
 def deps do
-  [{:cowboy, "~> 1.0.0"},
-   {:plug, "~> 1.0"}]
-end
+  [
+    {:cowboy, "~> 2.6.1"}, #...
 ```
 
 
@@ -58,9 +58,29 @@ mix deps.compile
 ## Hex
 
 The package manager for the Erlang ecosystem
-(can be used with rebar3 erlang build tool)
+
+```
+mix hex.search foo
+```
 
 [http://hex.pm](https://hex.pm/)
+
+
+## Code Formatation
+
+```
+mix format
+```
+
+
+## Mix XRef
+
+
+```
+mix xref unreachable
+# TODO
+```
+
 
 
 ## Plug

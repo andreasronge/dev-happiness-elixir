@@ -1386,19 +1386,12 @@ if true, do: 2, else: 4
 ## With
 
 ```elixir
-# from https://blog.sundaycoding.com/blog/2017/12/27/elixir-with-syntax-and-guard-clauses/
-def call(conn, _options) do
-  with user_id when not is_nil(user_id) <- get_session(conn, :user_id),
-       user when not is_nil(user) <- Repo.get(User, user_id)
-  do
-    assign(conn, :current_user, user)
-  else
-    _ ->
-      conn
-      |> Controller.put_flash(:error, "You have to sign in to access this page.")
-      |> Controller.redirect(to: "/sign_in_links/new")
-      |> halt
-  end
+with {:ok, width}  <- Map.fetch(opts, :width),
+     {:ok, height} <- Map.fetch(opts, :height)
+do
+  {:ok, width * height}
+else
+  :error -> {:error, :wrong_data}
 end
 ```
 
@@ -1523,17 +1516,33 @@ def some_op(a,b), do: a + b
 ## Output
 
 ```
-typeexample (master) $ mix dialyzer
-Starting Dialyzer
-dialyzer --no_check_plt --plt /Users/andreasronge/.dialyxir_core_19_1.3.2.plt -Wunmatched_returns -Werror_handling -Wrace_conditions -Wunderspecs /Users/andreasronge/projects/elixir/presentation/dev-happiness-elixir/typespecs/typeexample/_build/dev/lib/typeexample/ebin
-  Proceeding with analysis...
-typeexample.ex:3: Function run/0 has no local return
-typeexample.ex:3: The call 'Elixir.Typeexample':some_op(5,'you') will
-never return since it differs in the 2nd argument from the success
-typing arguments: (number(),number())
- done in 0m1.35s
-done (warnings were emitted)
+dialyzer_demo (master) $ mix dialyzer
+lib/dialyzer_demo.ex:19:no_return
+Function run/0 has no local return.
+________________________________________________________________________________
+lib/dialyzer_demo.ex:19:call
+The call:
+DialyzerDemo.some_op(5, :you)
 
+will never return since it differs in arguments with
+positions 2nd from the success typing arguments:
+
+(number(), number())
+________________________________________________________________________________
+```
+
+
+## Example, overspecs flag
+
+the specification is strictly less allowing than the success typing
+```
+  @spec run() :: pos_integer()
+  def run, do: some_op(5, 2)
+
+  @spec some_op(pos_integer(), pos_integer()) :: pos_integer()
+  def some_op(a, b) when 
+    is_integer(a) and b > 0 and 
+    is_integer(b) and a > 0, do: a + b
 ```
 
 
