@@ -125,24 +125,24 @@ Simplicity
 * There is a demand for elixir developers, [examples](https://github.com/doomspork/elixir-companies/blob/master/src/_data/companies.yml)
 
 
-## Example, Stateful Server
+## Example, Whistle
 
 ```elixir 
-  # see https://moboudra.com/whistle-interactive-web-apps-with-elixir/
   def update({:increment, n}, state, session) do
     {:ok, state + n, session}
   end
-
   def update({:decrement, n}, state, session) do
     {:ok, state - n, session}
   end
 
   def view(state, _session) do
-    Html.div([], [
-      Html.button([on: [click: {:increment, 1}]], "+"),
-      Html.text(to_string(state)),
-      Html.button([on: [click: {:decrement, 1}]], "-")
-    ])
+   ~H"""
+    <div>
+      <button on-click={{ :increment }}>+</button>
+      <span>The current number is: {{ state }}></span>
+      <button on-click={{ :decrement }}>-</button>
+    </div>
+    """
   end
 ```
 
@@ -170,25 +170,7 @@ Finished in 0.05 seconds
 
 ## Example, Docs
 
-```
-iex(4)> h Enum.map
-                            def map(enumerable, fun)                            
-
-  @spec map(t(), (element() -> any())) :: list()
-
-Returns a list where each item is the result of invoking fun on each
-corresponding item of enumerable.
-
-For maps, the function expects a key-value tuple.
-
-## Examples
-
-    iex> Enum.map([1, 2, 3], fn x -> x * 2 end)
-    [2, 4, 6]
-    
-    iex> Enum.map([a: 1, b: 2], fn {k, v} -> {k, -v} end)
-    [a: -1, b: -2]
-```
+[<img src="img/iex-doc.png">](img/iex-doc.png)
 
 
 ## Example, VsCode
@@ -214,15 +196,22 @@ Removing third party dependencies:
 ([Elixir In Action](https://www.manning.com/books/elixir-in-action))
 
 
+## Why not Elixir
+
+* Number crunching
+* Small scripts
+* Missing library
+
+
 ## Why not node ?
 
 * JavasScript Fatigue
 * Everyone think they can write JS code
   * mastering JS requires a significant amount of effort
 * Immaturity of tooling/poor quality
-* Single thread/event loop
-  * if process crashes/blocked ...
-* Imaging running a database inside your node application ...
+* Single thread/event loop:
+  * Don't block the event loop
+  * Async concurrency models
 
 
 ## Some Resources
