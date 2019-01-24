@@ -198,10 +198,12 @@ IO.puts(pid, "Hey there")
 
 ## When to use Processes
 
-* Mutable state and access to shared resources (such as ETS, files, etc.)
-* Concurrency and distribution
-* Initialization, shutdown and restart logic (as seen in supervisors)
-* System messages such as timer messages and monitoring events
+* Need state ?
+* Need concurrency and asynchronously ?
+* Need limit access to components ?
+* Need fault tolerance ?
+
+Don't uses processes unless you need it !
 
 
 ## Agents
