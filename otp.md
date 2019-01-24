@@ -359,7 +359,7 @@ iex> :observer.start
 * `:application` components/libraries
 * `:gen_event` event handling
 * `:gen_fsm` - finite state machine
-
+* ...
 
 
 # OTP: GenServer
@@ -516,7 +516,7 @@ defmodule FooServer do
     end
   end
 ```
-(Full source: [exercises/otp/my_gen_server](exercises/otp/my_gen_server/))
+(Full source: [exercises/otp/my_gen_server](https://github.com/andreasronge/dev-happiness-elixir/tree/master/exercises/otp/my_gen_server))
 
 
 ### GenServer Callbacks
