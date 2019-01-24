@@ -1,6 +1,6 @@
 # The Elixir Language
 
-[Back](/index.html)
+[Back](index.html)
 
 
 # Content

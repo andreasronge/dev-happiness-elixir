@@ -2,7 +2,7 @@
 
 Concurrency and the Erlang Runtime
 
-[Back](/index.html)
+[Back](index.html)
 
 
 # Content
@@ -1126,4 +1126,4 @@ To start the release you have built, you can use one of the following tasks:
 * [The Hitchhiker's Guide to Concurrency](https://learnyousomeerlang.com/the-hitchhikers-guide-to-concurrency)
 * [Erlang in Anger](https://www.erlang-in-anger.com/)
 
-[Back](/index.html)
+[Back](index.html)

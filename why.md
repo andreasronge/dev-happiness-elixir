@@ -2,7 +2,7 @@
 
 More than a language
 
-[Back](/index.html)
+[Back](index.html)
 
 
 ## What is Erlang/OTP
