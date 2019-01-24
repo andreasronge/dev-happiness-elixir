@@ -904,11 +904,11 @@ iex(2)> {a, b} = {b, a}
 {2, 1}
 iex(3)> {x, _} = {{1,true}, "foo"}
 {{1, true}, "foo"}
-iex(4)> {{1, flag}, "foo"} =  {{1,true}, "foo"}
+iex(4)> {{1, flag}, "foo"} = {{1,true}, "foo"}
 {{1, true}, "foo"}
 iex(5)> flag
 true
-iex(6)> {q={1, flag}, "foo"} =  {{1,true}, "foo"}
+iex(6)> {q={1, flag}, "foo"} = {{1,true}, "foo"}
 {{1, true}, "foo"}
 iex(7)> q
 {1, true}
