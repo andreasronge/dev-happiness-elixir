@@ -52,10 +52,10 @@ Ericsson Radio Systems banned the in-house use of Erlang for new products, citin
   * static analysis tool called Dialyzer
 
 
-## Who uses it
+## Who uses Erlang ?
 
-*	Game Servers, IoT (nerves), trading platforms, blockchain
-*	CouchDB, Riak, RabbitMQ, ejabberd, web servers, connection pooling
+* instant-messaging systems, Game Servers, real-time trading/bidding platforms
+* CouchDB, Riak, RabbitMQ, web servers
 
 
 ## Who cares ?
@@ -76,8 +76,7 @@ But I don't have 2,277,845 TCP connections or need distributed computing
 * Performance, e.g.
   * better performance => simpler design
 * Concurrency/Scalability/fault tolerance
-  * Used everywhere: e.g. run concurrent isolated tests
-  * actor model
+  * actor model everywhere
 * OTP design and ecosystem
   * how to distribute/config/assemble/reuse software
 
@@ -200,7 +199,7 @@ Removing third party dependencies:
 
 * Number crunching
 * Small scripts
-* Missing library
+* Missing library ?
 
 
 ## Why not node ?
@@ -225,5 +224,5 @@ Removing third party dependencies:
 * [Why I'm betting on elixir](https://rossta.net/blog/why-i-am-betting-on-elixir.html)
 * [Malmo Elixir Meetup](https://www.meetup.com/Malmo-Elixir/)
 
-[Back](/index.html)
+[Back](index.html)
 

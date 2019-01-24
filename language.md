@@ -91,12 +91,10 @@ true
 
 ## Equal
 
-* value equality: `==`
+* Works as expected
   * `1 == 1.0` is true (use === for strict)
   * `5 == "5"` is false
   * `"" == false` is false
-
-(The only difference between == and === is that === is strict when it comes to comparing integers and floats)
 
 
 ## And/Or
