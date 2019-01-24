@@ -704,7 +704,7 @@ end
 
 ## Full Example
 
-See [exercises/otp/stack](exercises/otp/stack)
+See [exercises/otp/stack](https://github.com/andreasronge/dev-happiness-elixir/blob/master/exercises/otp/stack/stack.ex)
 
 ```elixir
 defmodule MyStack do
@@ -935,6 +935,7 @@ GenServer.start_link, name: {:global, :some_alias}
 
 * Multiple redundant processes
 * `GenServer.multi_call` to update all
+
 
 
 # OTP Application
