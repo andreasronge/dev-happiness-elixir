@@ -214,15 +214,16 @@ Removing third party dependencies:
   * Async concurrency models
 
 
-## Some Resources
+## Random Links
 
 * [Elixir School](https://elixirschool.com/en/)
 * [Elixir Lang, getting started](https://elixir-lang.org/getting-started/introduction.html)
-* [Awesome Elixir](https://github.com/h4cc/awesome-elixir)
+* [Hex Package Manager](https://hex.pm/)
 * [exercism.io](http://exercism.io/)
+* [Pod/Screen casts](https://github.com/elixir-lang/elixir/wiki/Podcasts-and-Screencasts), [The Rabbit Hole](https://www.stridenyc.com/podcasts)
 * [Would you still pick Elixir in 2019?](https://github.com/dwyl/learn-elixir/issues/102?utm_source=elixirdigest&utm_medium=email&utm_campaign=featured)
-* IEX and elixir docs
 * [Why I'm betting on elixir](https://rossta.net/blog/why-i-am-betting-on-elixir.html)
+* [Malmo Elixir Meetup](https://www.meetup.com/Malmo-Elixir/)
 
 [Back](/index.html)
 
