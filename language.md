@@ -1819,7 +1819,32 @@ end
 # Macros
 
 * Meta programming: code that writes code
+* Elixir is written on Elixir by more than 90%
 * Should only be used as a last resort
+* Can be used for DSL
+* Expressions are three element tuples
+
+
+## Quote
+
+```
+iex(4)> expr = quote do: IO.puts("HEJ")
+{{:., [], [{:__aliases__, [alias: false], [:IO]}, :puts]}, [], ["HEJ"]}
+```
+
+
+## Unquote
+
+```
+iex(1)> number = 3
+iex(2)> quote do: 2 + unquote(number)
+{:+, [context: Elixir, import: Kernel], [2, 3]}
+```
+
+Q: what does this do ? 
+```elixir
+quote do: 2 + something
+```
 
 
 ## Example
@@ -1844,84 +1869,84 @@ MyModule.say_hello
 ```
 
 
-## using
-
-`use` calls `__using__` macro
-
-```elixir
-defmodule HelloLibrary do  
-  defmacro __using__(_) do
-    quote do
-      def say_hello, do: IO.puts("Hello")
-    end
-  end
-end
-```
-
-
-## Usage
-Using `__using__`
-
-```elixir
-defmodule MyModule do
-  use HelloLibrary
-end
-
-MyModule.say_hello
-```
-
-
-## Quote
-
-```
-iex(4)> expr = quote do: IO.puts("HEJ")
-{{:., [], [{:__aliases__, [alias: false], [:IO]}, :puts]}, [], ["HEJ"]}
-```
-
-
-## Unquote
-
-```
-iex(1)> number = 3
-iex(2)> quote do: 2 + unquote(number)
-{:+, [context: Elixir, import: Kernel], [2, 3]}
-```
-
-
-## AST argument
-
-```elixir
-defmacro nice_print({:+, _meta, [lhs, rhs]}) do
- ...
-```
-
-```
-iex(2)> MyMacros.nice_print 2 + 3
-  2
-+ 3
-  --
-  5
-```
-
-[complete example](https://hackernoon.com/understanding-elixir-macros-3464e141434c)
-
-
-## Unquote Example 2
+## Example 2
 
 ```elixir
 defmodule Unless do
   defmacro macro_unless(clause, do: expression) do
     quote do
-      if(!unquote(clause), do: unquote(expression))h
+      if(!unquote(clause), do: unquote(expression))
     end
   end
 end
+# Usage:
+#  def demo do
+#    require Unless
+#    Unless.macro_unless false do
+#      IO.puts("YEAH")
+#    end
+#  end
 ```
 
+
+## using
+
+`use` calls `__using__` macro
+
+```elixir
+defmodule Unless do
+  defmacro __using__(_) do
+    quote do
+      import Unless2
+    end
+  end
+
+#  defmacro my_unless(clause, do: expression) do ...
+end
+# Usage
+# defmodule UnlessDemo do
+#  use Unless  <- calls Unless__using
+#
+#  def demo do
+#    my_unless false do
+
 ```
-iex(2)> require Unless
-iex(3)> Unless.macro_unless false, do: IO.puts "this should never be printed"
-this should never be printed
+
+
+## Scope
+
+What and when is IO.puts called ?
+
+```elixir
+ defmacro macro_unless(clause, do: expression) do
+    IO.puts "Hi"
+    quote do
+      if(!unquote(clause), do: unquote(expression))
+    end
+  end
+```
+
+
+## What does this do ?
+
+```elixir
+defmodule What do
+  defmacro __using__(options) do
+    quote do
+      What.does_this_do(unquote(options))
+    end
+  end
+
+  defmacro does_this_do(def_names) do
+    for def_name <- def_names do
+      quote do
+        @doc "Hmm, what does this do ?"
+        @spec unquote(def_name)() :: any()
+        def unquote(def_name)(), do: IO.inspect(unquote(def_name))
+      end
+    end
+  end
+end
 ```
 
 
