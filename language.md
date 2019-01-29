@@ -1589,76 +1589,83 @@ end
 
 # Behaviours
 
-* Enables:
-  * define a set of functions that have to be implemented
-  * ensure that a module implements all the functions
+* "Don't call us, we'll call you"
+* Inversion of Control
+* FP version of Template Method Pattern
+* OTP behaviour: generic and specific parts
+
+
+## Behaviour
+
+* Functions to be implemted are declared by @callback
+* ensure that a module implements all the functions
 * Compile time checks of function specifications
-* Defined with @callback
-* Abstract generic functionalities
 
 
-## Behaviour and OTP
-
-Behaviours are formalizations of these common patterns.
-Divide the code for a process in a
-* generic part (a behaviour module)
-* specific part (a callback module).
-
-note: British spelling
-
-
-## Dynamic Invocation
-
-```
-iex> x = IO
-IO
-iex> x.puts "HEJ"
-HEJ
-:ok
-iex> apply(IO, :puts, ["hej"])
-hej
-:ok
-```
-
-MFA - module, function, arguments list
-
-
-## Silly Example
+## Behaviour
+Specification
 
 ```elixir
-defmodule Greeter do
-  @callback say_hello(String.t) :: any
-  @callback say_goodbye(String.t) :: any
+defmodule Worker do
+  @callback init() :: {:ok, state :: any} | {:error, reason :: any}
+  @callback perform(state :: any) :: {:ok, result :: any} | {:error, reason :: any}
 end
-defmodule NormalGreeter do
-  @behaviour Greeter
-  def say_hello(name), do: IO.puts "Hello, #{name}"
-  def say_goodbye(name), do: IO.puts "Goodbye, #{name}"
-end
-defmodule HelloAll do
-  def hello_to_all(greeters) do
-    greeters |> Enum.each(& &1.say_hello("andreas"))
+```
+
+
+## Behaviour
+Specific Part
+
+```elixir
+defmodule Md5Worker do
+  @behaviour Worker
+
+  @impl Worker
+  def init(), do: {:ok, "lots of data"}
+
+  @impl Worker
+  def perform(state) do
+    {:ok, :crypto.hash(:md5, state) |> Base.encode16()}
   end
 end
-
-HelloAll.hello_to_all([NormalGreeter])
 ```
 
 
-## Excercie
+## Behaviour
+Generic Part
 
-Implement `Parser` so that:
 ```elixir
-JSONParser.parse("foo") -> {:ok, "foo"}
-Parser.parse!(JSONParser, "foo") -> "foo"
-Parser.parse!(JSONParser, "bar") # raise Argument exception (iex> h raise)
+defmodule WorkProcess do
+  def execute(worker) do
+    with {:ok, state} <- worker.init() do
+      worker.perform(state)
+    else
+      {:error, message} -> "oops #{inspect(message)}"
+    end
+  end
+end
+```
+
+
+## Exercise
+
+```elixir
+defmodule Parser do
+  @callback parse(data :: String.t) :: map()
+end
 
 defmodule JSONParser do
-  @behaviour Parser
-  def parse("foo"), do: {:ok, "foo"}
-  def parse(_), do: {:error, "oh no"}
+  @doc """
+  1) Make this module impl. the Parser behaviour
+  2) Make sure this example works:
+  ## Examples
+
+      iex> JSONParser.parse("hej")
+      %{data: "hej"}
+  """
+  def parse(data) do
+  end
 end
-# https://elixir-lang.org/getting-started/typespecs-and-behaviours.html
 ```
 
 
@@ -1666,17 +1673,18 @@ end
 
 ```elixir
 defmodule Parser do
-  @callback parse(String.t) :: {:ok, String.t} | {:error, String.t}
+  @callback parse(data :: String.t()) :: map()
+end
 
-  def parse!(implementation, contents) do
-    case implementation.parse(contents) do
-      {:ok, data} -> data
-      {:error, error} -> raise ArgumentError, "parsing error: #{error}"
-    end
+defmodule JSONParser do
+  @behaviour Parser
+
+  @impl Parser
+  def parse(data) do
+    %{data: data}
   end
 end
 ```
-
 
 
 # Protocols
@@ -1684,7 +1692,7 @@ Polymorphism in Elixir
 Extending external modules
 
 
-## Example
+## Usage Example
 
 Enum protocol - iterate over different args.
 
@@ -1810,11 +1818,8 @@ end
 
 # Macros
 
-Considered to be bad style to use them when they’re not necessary.
-Macros should only be used as a last resort.
-
-Can be used to override the built-in macros such as:
-`unless/2, defmacro/2, def/2, defprotocol/2 ...` (but please don't :)
+* Meta programming: code that writes code
+* Should only be used as a last resort
 
 
 ## Example
