@@ -1012,21 +1012,6 @@ iex>[f={_, c}|t] = icecreams
 ```
 
 
-# with
-
-Combines matching clauses.
-
-```
-iex> opts = %{width: 10, height: 15}
-iex> with {:ok, width} <- Map.fetch(opts, :width),
-...>      {:ok, height} <- Map.fetch(opts, :height),
-...>   do: {:ok, width * height}
-{:ok, 150}
-```
-
-[Kernel.SpecialForms.html#with/1](https://hexdocs.pm/elixir/Kernel.SpecialForms.html#with/1)
-
-
 ## Function argument
 
 ```elixir
@@ -1394,6 +1379,23 @@ end
 ```
 
 
+## With Example
+
+```elixir
+# %Macro.Env{file: file, line: line} = __CALLER__
+# [_, file_name] = Regex.run(~r[.*/(\w*)], file)
+# at_file = "[#{file_name}.ex:#{line}] "
+# {var_name, _, _} = name
+
+{at_file, var_name} =
+  with %Macro.Env{file: file, line: line} <- __CALLER__,
+       {var_name, _, _} <- name_ast,
+       [_, file_name] <- Regex.run(~r[.*/(\w*)], file) do
+    {"[#{file_name}.ex:#{line}]", var_name}
+  end
+```
+
+
 # Stream module
 
 Similar to Enum but supports lazy operations.
@@ -1687,8 +1689,11 @@ end
 ```
 
 
+
 # Protocols
+
 Polymorphism in Elixir
+
 Extending external modules
 
 
