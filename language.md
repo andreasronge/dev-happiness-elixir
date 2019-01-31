@@ -1396,6 +1396,7 @@ end
 ```
 
 
+
 # Stream module
 
 Similar to Enum but supports lazy operations.
@@ -1410,6 +1411,7 @@ File.stream!("/path/to/file")
 |> Stream.into(File.stream!("/path/to/other/file"))
 |> Stream.run()
 ```
+
 
 
 # Typespecs
@@ -1824,7 +1826,7 @@ end
 # Macros
 
 * Meta programming: code that writes code
-* Elixir is written on Elixir by more than 90%
+* Elixir is written in Elixir by more than 90%
 * Should only be used as a last resort
 * Can be used for DSL
 * Expressions are three element tuples
@@ -1874,6 +1876,24 @@ MyModule.say_hello
 ```
 
 
+## Using
+
+```
+# I want magic to happen when I use the module.
+defmodule HelloMagic do
+  defmacro __using__(_options) do
+    quote do
+      def say_hello, do: IO.puts "Hello"
+    end
+  end
+end
+# HelloMagicDemo.say_hello => "Hello"
+defmodule HelloMagicDemo do
+  use HelloMagic
+end
+```
+
+
 ## Example 2
 
 ```elixir
@@ -1891,30 +1911,6 @@ end
 #      IO.puts("YEAH")
 #    end
 #  end
-```
-
-
-## using
-
-`use` calls `__using__` macro
-
-```elixir
-defmodule Unless do
-  defmacro __using__(_) do
-    quote do
-      import Unless2
-    end
-  end
-
-#  defmacro my_unless(clause, do: expression) do ...
-end
-# Usage
-# defmodule UnlessDemo do
-#  use Unless  <- calls Unless__using
-#
-#  def demo do
-#    my_unless false do
-
 ```
 
 
@@ -1939,6 +1935,7 @@ defmodule What do
   defmacro __using__(options) do
     quote do
       What.does_this_do(unquote(options))
+
     end
   end
 
@@ -1951,6 +1948,53 @@ defmodule What do
       end
     end
   end
+end
+```
+
+
+### Using and Behaviour
+
+```elixir
+defmodule GenServer do
+  defmacro __using__(_) do  
+    quote do
+      @behaviour :gen_server
+```
+
+GenServer module calls your callbacks.
+
+## Exercise
+
+```elixir
+# Impl. MyGenServer.transform(MyGenServerDemo) => "hej hopp"
+defmodule MyGenServer do  
+  @callback init() :: String.t()
+  @callback handle_transform(data :: String.t()) :: String.t()
+
+  defmacro __using__(_params) do
+    quote do
+      @behaviour MyGenServer
+    end
+  end
+
+  def transform(module) do
+    module.init |> module.handle_transform
+  end
+end
+```
+
+
+## Solution
+
+```elixir
+defmodule MyGenServerImpl do
+  use MyGenServer
+
+  @impl MyGenServer
+  def init, do: "hej"
+
+  @impl MyGenServer
+  def handle_transform(data), do: "#{data} hopp"
 end
 ```
 
@@ -2009,15 +2053,3 @@ defmodule Resources do
   end
 end
 ```
-
-
-### Using and Behaviour
-
-```elixir
-defmodule GenServer do
-  defmacro __using__(_) do  
-    quote do
-      @behaviour :gen_server
-```
-
-GenServer module calls your callbacks.
