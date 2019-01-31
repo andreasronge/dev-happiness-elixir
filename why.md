@@ -124,6 +124,11 @@ Simplicity
 * There is a demand for elixir developers, [examples](https://github.com/doomspork/elixir-companies/blob/master/src/_data/companies.yml)
 
 
+## Example, Supervisors
+
+[<img src="img/actors.png">](https://buildplease.com/pages/supervisors-csharp/)
+
+
 ## Example, Whistle
 
 ```elixir 
@@ -170,6 +175,11 @@ Finished in 0.05 seconds
 ## Example, Docs
 
 [<img src="img/iex-doc.png">](img/iex-doc.png)
+
+
+## Example, Docs
+
+[<img src="img/hexdoc.png">](img/hexdoc.png)
 
 
 ## Example, VsCode
