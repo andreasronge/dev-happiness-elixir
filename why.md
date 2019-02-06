@@ -5,26 +5,26 @@ More than a language
 [Back](index.html)
 
 
-## What is Erlang/OTP
+## What is Erlang/OTP ?
 
-* Created 1986 at Ericsson, Opensourced 1998
-* Language 
-  * Functional
-  * Immutable data
-  * Pattern matching
-* Runtime system supporting distributed computing
-* Components and design principles (OTP)
-* Slogan: "Write once, run forever"
+* Functional Language
+* Distributed Runtime System
+* Tooling/Libraries/Design principles
 
 
 ## History
 
-In 1998 Ericsson announced the AXD301 switch, containing over a million lines of Erlang and reported to achieve a high availability of nine "9"s. 
+* 1985 - Built for Ericsson AXE telephone exhange
+* 1998 - Open sourced (9 nines)
+* 2007 - Rabbit MQ, Whats Up (2,277,845)
+* 2014 - Elixir 1.0
+* 2015 - Phoenix 1.0
+* 2018 - Nerves 1.0
 
-Ericsson Radio Systems banned the in-house use of Erlang for new products, citing a preference for non-proprietary languages. The ban caused Armstrong and others to leave Ericsson. The implementation was open-sourced at the end of the year Ericsson eventually lifted the ban; it re-hired Armstrong in 2004. (wikipedia)
+mature => ready to use
 
 
-## Why Erlang
+## Erlang
 
 * Fault-tolerant
 * High availability
@@ -35,67 +35,59 @@ Ericsson Radio Systems banned the in-house use of Erlang for new products, citin
 * Hot swapping of code
 
 
+## Use Cases
+
+* Parallel computing
+* Web Apps
+* Embedded
+
+
 ## How, Beam
 
-* support distributed computing
-* everything is a process
-* processes are strongly isolated
-* message passing is the only way to interact
+* OS for distributed computing
+  * isolated processes
+  * message passing
 
 
-## How, OTP
+## Actor Model
 
-* best practices based on years of experience
-  * behaviours for servers, supervisors, event handling, statemachines, ...
-* huge set of tooling/libraries, e.g
-  * distributed database
-  * static analysis tool called Dialyzer
+[<img src="https://cdn-images-1.medium.com/max/1600/1*dP7zn0FuqLGRkd_1vimsxw.png">](https://cdn-images-1.medium.com/max/1600/1*dP7zn0FuqLGRkd_1vimsxw.png)
 
 
-## Who uses Erlang ?
+## Elixir Example
 
-* instant-messaging systems, Game Servers, real-time trading/bidding platforms
-* CouchDB, Riak, RabbitMQ, web servers
+State via Recursion
 
-
-## Who cares ?
-
-* Support 2,277,845 simultaneous TCP connections on one machine
-* How do you support 450 million users with only 32 engineers ?
-* Downtime of 1 sec per 20 year
-* Transparent message passing (remote and local)
-
-
-## Who cares ?
-
-But I don't have 2,277,845 TCP connections or need distributed computing
+```elixir
+defmodule MyState do
+  def loop(state) do
+    receive do
+      {from, {:set, key, value}} ->
+        loop(Map.put(state, key, value))
+    end
+  end
+end
+# pid = spawn(MyState, :loop, [%{bar: "foo"}])
+```
 
 
-## Why you should care
+## OTP
 
-* Performance, e.g.
-  * better performance => simpler design
-* Concurrency/Scalability/fault tolerance
-  * actor model everywhere
-* OTP design and ecosystem
-  * how to distribute/config/assemble/reuse software
-
-Simplicity
+* A distributed runtime system (OS)
+* Tooling and behaviours for parallel processing
+* How to design/distribute/config/reuse...
 
 
 ## What is Elixir ?
 
-* A functional programming language run on the Erlang VM (BEAM)
-* Created 2011 by Jose Valim
+* Functional programming language
+* Run on Erlang VM (BEAM)
 * Compiles to bytecode for BEAM
 
 
 ## Why Elixir, 1
 
-* Since using Erlang VM, e.g:
-  * Highly distributed system
-  * Low latency & high availability
-  * Great for parallel processing
+* Erlang and OTP (!)
 * Since using Elixir:
   * Better productivity and extensibility
   * Modern functional language
@@ -120,8 +112,8 @@ Simplicity
 * Built in tooling: e.g build/docs/monitoring/testing/code formatter ...
 * Phoenix webframework
 * Great people/community: Dave Thomas (pragdave), Bruce Tate, Jose Valim
-* Rethink how we design software
-* There is a demand for elixir developers, [examples](https://github.com/doomspork/elixir-companies/blob/master/src/_data/companies.yml)
+* Paradigm shift
+* [Companies using elixir](https://github.com/doomspork/elixir-companies/blob/master/src/_data/companies.yml)
 
 
 ## Example, Supervisors
@@ -152,7 +144,7 @@ end
 ```
 
 
-## Example, Whistle
+## Paradigm shift ?
 
 ```elixir 
   def update({:increment, n}, state, session) do
