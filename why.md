@@ -7,6 +7,9 @@ Consultant at Jayway
 [Back](index.html)
 
 
+<iframe width="560" height="315" src="https://www.youtube.com/embed/lxYFOM3UJzo" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+
 ## What is Erlang/OTP ?
 
 * Functional Language
@@ -39,10 +42,11 @@ mature => ready to use
 
 * Telecom, GPRS/3G
 * Message broker
-* Distributed databases
+* Distributed database
 * Webserver
+* Data pipelines
 * Finance and blockchains
-* Webapps, realtime updates
+* Webapps with realtime updates
 * Embedded
 * ...
 
@@ -142,6 +146,16 @@ Paradigm shift ?
 </div>
 
 
+## Erlang - Elixir
+
+* Erlang 
+  * niche computer language (OTP)
+  * when you had no choice ?
+* Elixir
+  * general purpose
+  * for productivity
+
+
 ## Why not Elixir
 
 * Number crunching
@@ -193,22 +207,22 @@ end
 ## Paradigm shift ?
 
 ```elixir 
-  def update({:increment, n}, state, session) do
-    {:ok, state + n, session}
-  end
-  def update({:decrement, n}, state, session) do
-    {:ok, state - n, session}
-  end
-
-  def view(state, _session) do
-   ~H"""
-    <div>
-      <button on-click={{ :increment }}>+</button>
-      <span>The current number is: {{ state }}></span>
-      <button on-click={{ :decrement }}>-</button>
-    </div>
-    """
-  end
+# https://github.com/boudra/whistle
+def update({:increment, n}, state, session) do
+  {:ok, state + n, session}
+end
+def update({:decrement, n}, state, session) do
+  {:ok, state - n, session}
+end
+def view(state, _session) do
+  ~H"""
+  <div>
+    <button on-click={{ :increment }}>+</button>
+    <span>The current number is: {{ state }}></span>
+    <button on-click={{ :decrement }}>-</button>
+  </div>
+  """
+end
 ```
 
 
@@ -266,12 +280,13 @@ Removing third party dependencies:
 ([Elixir In Action](https://www.manning.com/books/elixir-in-action))
 
 
-## Random Links
+## Links
 
 * [Elixir School](https://elixirschool.com/en/)
 * [Elixir Lang, getting started](https://elixir-lang.org/getting-started/introduction.html)
 * [Hex Package Manager](https://hex.pm/)
 * [exercism.io](http://exercism.io/)
+* [LiveView](https://dockyard.com/blog/2018/12/12/phoenix-liveview-interactive-real-time-apps-no-need-to-write-javascript)
 * [Pod/Screen casts](https://github.com/elixir-lang/elixir/wiki/Podcasts-and-Screencasts), [The Rabbit Hole](https://www.stridenyc.com/podcasts)
 * [Would you still pick Elixir in 2019?](https://github.com/dwyl/learn-elixir/issues/102?utm_source=elixirdigest&utm_medium=email&utm_campaign=featured)
 * [Why I'm betting on elixir](https://rossta.net/blog/why-i-am-betting-on-elixir.html)
