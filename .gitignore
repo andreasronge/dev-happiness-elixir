@@ -6,3 +6,4 @@ deps/
 _build/
 *.beam
 *.log
+.history

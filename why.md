@@ -1,6 +1,8 @@
 # Why Elixir ?
 
-More than a language
+Andreas Ronge, @ronge
+
+Consultant at Jayway
 
 [Back](index.html)
 
@@ -16,7 +18,7 @@ More than a language
 
 * 1985 - Built for Ericsson AXE telephone exhange
 * 1998 - Open sourced (9 nines)
-* 2007 - Rabbit MQ, Whats Up (2,277,845)
+* &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp;- Rabbit MQ, Whats Up, Klarna, ...
 * 2014 - Elixir 1.0
 * 2015 - Phoenix 1.0
 * 2018 - Nerves 1.0
@@ -24,34 +26,37 @@ More than a language
 mature => ready to use
 
 
-## Erlang
+## Design for
 
-* Fault-tolerant
-* High availability
-* Hot code replacement
-* Self healing network
+* Massive Concurrency
 * Distributed
 * Soft real-time
+* Extreme Reliability
 * Hot swapping of code
 
 
-## Use Cases
+## Useful for
 
-* Parallel computing
-* Web Apps
+* Telecom, GPRS/3G
+* Message broker
+* Distributed databases
+* Webserver
+* Finance and blockchains
+* Webapps, realtime updates
 * Embedded
+* ...
 
 
 ## How, Beam
 
-* OS for distributed computing
+* Distributed OS for concurrency
   * isolated processes
   * message passing
 
 
-## Actor Model
+#### Distributed Actor Model
 
-[<img src="https://cdn-images-1.medium.com/max/1600/1*dP7zn0FuqLGRkd_1vimsxw.png">](https://cdn-images-1.medium.com/max/1600/1*dP7zn0FuqLGRkd_1vimsxw.png)
+[<img src="img/processes.png">](img/processes.png)
 
 
 ## Elixir Example
@@ -78,6 +83,20 @@ end
 * How to design/distribute/config/reuse...
 
 
+## Why Erlang ?
+
+[<img src="img/actors.png">](https://buildplease.com/pages/supervisors-csharp/)
+
+
+## The Holy Grail
+
+of software development
+
+[<img src="img/lego.jpg">](https://buildplease.com/pages/supervisors-csharp/)
+
+OTP Applications
+
+
 ## What is Elixir ?
 
 * Functional programming language
@@ -85,55 +104,82 @@ end
 * Compiles to bytecode for BEAM
 
 
-## Why Elixir, 1
+## Why Elixir ?
 
-* Erlang and OTP (!)
-* Since using Elixir:
-  * Better productivity and extensibility
-  * Modern functional language
-  * Great tooling
-  * Compatibility with Erlang's eco system
+<div class="fragment" data-fragment-index="2">
+Runs on Erlang/OTP
+</div>
+<div class="fragment" data-fragment-index="3">
+Stable FP language
+</div>
+<div class="fragment" data-fragment-index="4">
+Extensible design (macros, protocols)
+</div>
+<div class="fragment" data-fragment-index="5">
+Easy to learn - explicit, no magic
+</div>
+
+<div class="fragment" data-fragment-index="6">
+First class documentation
+</div>
+<div class="fragment" data-fragment-index="7">
+Excellent builtin tooling
+</div>
+<div class="fragment" data-fragment-index="8">
+Great testing support
+</div>
+<div class="fragment" data-fragment-index="9">
+Phoenix webframework
+</div>
+<div class="fragment" data-fragment-index="10">
+Great people/community
+</div>
+<div class="fragment" data-fragment-index="11">
+Paradigm shift ?
+</div>
+<div class="fragment" data-fragment-index="12">
+[Companies using elixir](https://github.com/doomspork/elixir-companies/blob/master/src/_data/companies.yml)
+</div>
 
 
-## Why Elixir, 2
+## Why not Elixir
 
-* Stable language
-* Extensible design (macros, protocols)
-* Easy to learn - explicit, no magic
-* First class documentation
-* Syntax matters => maintainable code
-* Excellent testing support
-* Support on Google Cloud and soon on AWS Lambda
-* Fun and productive language !
+* Number crunching
+* Command line scripts
+* Missing library ?
 
 
-## Why Elixir, 3
-
-* Built in tooling: e.g build/docs/monitoring/testing/code formatter ...
-* Phoenix webframework
-* Great people/community: Dave Thomas (pragdave), Bruce Tate, Jose Valim
-* Paradigm shift
-* [Companies using elixir](https://github.com/doomspork/elixir-companies/blob/master/src/_data/companies.yml)
+# Examples
 
 
-## Example, Supervisors
+## Github Issues
 
-[<img src="img/actors.png">](https://buildplease.com/pages/supervisors-csharp/)
+[<img height="350" src="img/github-issues.png">](img/github-issues.png)
+
+(Rust and Go has 4000+)
+
+
+## Plug
+
+[<img src="img/plug.png">](img/plug.png)
 
 
 ## Example, Plug
 
 ```elixir
-# https://github.com/elixir-plug/plug/blob/master/README.md
-def hello_world_plug(conn, _opts) do
-  conn
-  |> put_resp_content_type("text/plain")
-  |> send_resp(200, "Hello world")
+defmodule PlugA do
+  def call(conn) do
+    conn
+    |> put_resp_content_type("text/plain")
+    |> send_resp(200, "Hello world")
+  end
 end
+# Usage:
+# conn |> PlugA.conn |> PlugB.conn |> ...
 ```
 
 
-## Example, Pattern Matching
+## Pattern Matching Superpower
 
 ```elixir
 defmodule Fib do 
@@ -218,24 +264,6 @@ Removing third party dependencies:
 
 [<img src="img/elixir-in-action.png">](img/vscode.png)
 ([Elixir In Action](https://www.manning.com/books/elixir-in-action))
-
-
-## Why not Elixir
-
-* Number crunching
-* Small scripts
-* Missing library ?
-
-
-## Why not node ?
-
-* JavasScript Fatigue
-* Everyone think they can write JS code
-  * mastering JS requires a significant amount of effort
-* Immaturity of tooling/poor quality
-* Single thread/event loop:
-  * Don't block the event loop
-  * Async concurrency models
 
 
 ## Random Links
