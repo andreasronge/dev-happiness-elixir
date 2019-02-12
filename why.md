@@ -1,5 +1,7 @@
 # Why Elixir ?
 
+The First [Malm&ouml; Elixir Meetup](https://www.meetup.com/Malmo-Elixir/)
+
 Andreas Ronge, @ronge
 
 Consultant at Jayway
@@ -8,6 +10,9 @@ Consultant at Jayway
 
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/lxYFOM3UJzo" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+
+[<img src="https://i.ytimg.com/vi/uKfKtXYLG78/hqdefault.jpg">](https://i.ytimg.com/vi/uKfKtXYLG78/hqdefault.jpg)
 
 
 ## What is Erlang/OTP ?
@@ -77,6 +82,7 @@ defmodule MyState do
   end
 end
 # pid = spawn(MyState, :loop, [%{bar: "foo"}])
+# send(pid, {self(), {:set, :hej, "hopp"}})
 ```
 
 
@@ -146,16 +152,6 @@ Paradigm shift ?
 </div>
 
 
-## Erlang - Elixir
-
-* Erlang 
-  * niche computer language (OTP)
-  * when you had no choice ?
-* Elixir
-  * general purpose
-  * for productivity
-
-
 ## Why not Elixir
 
 * Number crunching
@@ -176,6 +172,17 @@ Paradigm shift ?
 ## Plug
 
 [<img src="img/plug.png">](img/plug.png)
+
+
+## Phoenix Framework
+
+```elixir
+connection
+|> endpoint
+|> router
+|> pipeline
+|> controller
+```
 
 
 ## Example, Plug
