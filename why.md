@@ -274,7 +274,7 @@ Finished in 0.05 seconds
 [<img src="img/vscode.png">](img/vscode.png)
 
 
-## Complile Time Macros
+## Compile Time Macros
 
 [<img src="img/compile_errors_html.png">](img/compile_errors_html.png)
 
