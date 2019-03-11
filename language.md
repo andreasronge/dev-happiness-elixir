@@ -1576,6 +1576,20 @@ Examples, type ::
 * {:ok, type}  
 
 
+## Function
+
+```elixir
+@spec run() :: (number() -> number())
+def run do
+  fn x -> x * 2 end
+end
+
+# or
+@type num_func :: (number() -> number())
+@spec run() :: num_func
+```
+
+
 ## Module Types
 
 Example:
@@ -1585,8 +1599,11 @@ Example:
 
 
 ## Algebraic Types
- * Union types - product types (i.e., tuples and records)
- * Intersection types - (sum types, Discriminated Union)
+
+ * Union types - specified with | (or)
+   * e.g. `type color :: :red | :blue`
+ * Intersection types - missing support ?
+   * e.g. character has name, surname and age.
 
 
 ## Defining type
