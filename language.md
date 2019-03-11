@@ -1416,9 +1416,80 @@ File.stream!("/path/to/file")
 
 # Typespecs
 
-* Used as documentation and for the Dialyzer tool
-* Static analysis of code
-* Extends the Erlang syntax
+* Compiled Dynamically Typed Language
+* With optionally declaring types 
+  * Used as documentation
+  * Static analysis of code, dialyzer
+
+
+## Dialyzer 
+
+* Erlang Tool
+* Identifies discrepancies
+* PLT - cached output of the analysis 
+
+
+Discriminated Union
+## Example
+
+```elixir
+defmodule Typeexample do
+  def run, do: some_op(5, :you)
+  def some_op(a,b), do: a + b
+end
+```
+
+
+## mix dialyzer
+
+```
+lib/typeexample.ex:3:no_return
+Function run/0 has no local return.
+________________________________________________________________________________
+lib/typeexample.ex:3:call
+The call:
+Typeexample.some_op(5, :you)
+
+will never return since it differs in arguments with
+positions 2nd from the success typing arguments:
+
+(number(), number())
+```
+
+
+## mix dialyzer.explain no_return
+
+
+## Example
+
+```elixir
+@spec hello(String.t) :: String.t
+def hello(message) do
+  "Hello #{message}"
+end
+
+def run, do: hello(1)
+```
+
+
+## mix dialyzer
+
+```
+lib/typeexample.ex:11:no_return
+Function run/0 has no local return.
+________________________________________________________________________________
+lib/typeexample.ex:11:call
+The call:
+Typeexample.hello(1)
+
+breaks the contract
+(String.t()) :: String.t()
+```
+
+
+## Algebraic Types
+ * Union types - product types (i.e., tuples and records)
+ * Intersection types - (sum types)
 
 
 ## Attributes

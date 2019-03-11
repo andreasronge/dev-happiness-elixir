@@ -27,6 +27,6 @@ defmodule Typeexample.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-     [{:dialyxir, "~> 0.3.5", only: [:dev]}]
+     [{:dialyxir, "~> 1.0.0-rc.4", only: [:dev], runtime: false}]
   end
 end
