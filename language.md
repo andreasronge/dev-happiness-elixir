@@ -1429,7 +1429,6 @@ File.stream!("/path/to/file")
 * PLT - cached output of the analysis 
 
 
-Discriminated Union
 ## Example
 
 ```elixir
@@ -1460,6 +1459,13 @@ positions 2nd from the success typing arguments:
 ## mix dialyzer.explain no_return
 
 
+## Specs
+
+* Syntax:
+
+  `@spec function_name(type1, type2) :: return_type`
+
+
 ## Example
 
 ```elixir
@@ -1487,9 +1493,46 @@ breaks the contract
 ```
 
 
-## Algebraic Types
- * Union types - product types (i.e., tuples and records)
- * Intersection types - (sum types)
+## Specifying wrong types
+
+What if:
+```elixir
+  @spec some_op(String.t(), number) :: number
+  def some_op(a, b), do: a + b
+  def run, do: some_op("hej", 1)
+```
+
+
+## Result
+
+```
+lib/typeexample.ex:6:invalid_contract
+Invalid type specification for function.
+
+Function:
+Typeexample.some_op/2
+
+Success typing:
+@spec some_op(number(), number()) :: number()
+________________________________________________
+```
+
+
+## Guards and Specs
+
+This will not be detected:
+```elixir
+  # missing: and a >= 0 and b >= 0 
+  @spec some_op(non_neg_integer(), non_neg_integer()) :: 
+    :error | integer()
+  def some_op(a, b) when a >= b and is_integer(a) and is_integer(b),
+    do: a - b
+
+  def some_op(a, b) when a < b and is_integer(a) and is_integer(b),
+    do: :error
+
+  def run, do: some_op(1, 2) + 3
+```
 
 
 ## Attributes
@@ -1500,6 +1543,15 @@ breaks the contract
 * `@spec`
 * `@callback`
 * `@macrocallback`
+
+
+## Types of types
+
+* Basic Types e.g. pid(), integer()
+* Literals e.g. true, 1..10, [any()]
+* Built in types (shortcuts), e.g. boolean(), list() 
+* Remote types, String.t
+* User defined types
 
 
 ## Basic Type
@@ -1532,6 +1584,11 @@ Example:
 * String.t
 
 
+## Algebraic Types
+ * Union types - product types (i.e., tuples and records)
+ * Intersection types - (sum types, Discriminated Union)
+
+
 ## Defining type
 
 * Syntax:
@@ -1545,11 +1602,14 @@ Example:
   `@type dict(key, value) :: [{key, value}]`
 
 
-## Specs
+## Maps
 
-* Syntax:
+```elixir
+  @type foo :: %{:bar => 42, optional(:foo) => 1..4}
 
-  `@spec function_name(type1, type2) :: return_type`
+  @spec baaz() :: foo
+  def baaz, do: %{bar: 42}
+```
 
 
 ## Example
@@ -1567,55 +1627,6 @@ defmodule LousyCalculator do
   @spec multiply(number, number) :: number_with_remark
   def multiply(x, y), do: {x * y, "It is like addition on steroids."}
 end
-```
-
-
-## Dialyzer
-
-* Static analysis tool
-* analyze the BEAM files
-* can be useful even without @specs
-* Persistent Lookup Table
-
-
-## Running Dialyzer
-
-```elixir
-def run, do: some_op(5, :you)
-def some_op(a,b), do: a + b
-```
-
-
-## Output
-
-```
-dialyzer_demo (master) $ mix dialyzer
-lib/dialyzer_demo.ex:19:no_return
-Function run/0 has no local return.
-________________________________________________________________________________
-lib/dialyzer_demo.ex:19:call
-The call:
-DialyzerDemo.some_op(5, :you)
-
-will never return since it differs in arguments with
-positions 2nd from the success typing arguments:
-
-(number(), number())
-________________________________________________________________________________
-```
-
-
-## Example, overspecs flag
-
-the specification is strictly less allowing than the success typing
-```
-  @spec run() :: pos_integer()
-  def run, do: some_op(5, 2)
-
-  @spec some_op(pos_integer(), pos_integer()) :: pos_integer()
-  def some_op(a, b) when 
-    is_integer(a) and b > 0 and 
-    is_integer(b) and a > 0, do: a + b
 ```
 
 
